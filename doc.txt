@@ -1,0 +1,52 @@
+2023-05-22 03:41:30 Traceback (most recent call last):
+2023-05-22 03:41:30   File "/usr/local/bin/uvicorn", line 8, in <module>
+2023-05-22 03:41:30     sys.exit(main())
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 1130, in __call__
+2023-05-22 03:41:30     return self.main(*args, **kwargs)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 1055, in main
+2023-05-22 03:41:30     rv = self.invoke(ctx)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 1404, in invoke
+2023-05-22 03:41:30     return ctx.invoke(self.callback, **ctx.params)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 760, in invoke
+2023-05-22 03:41:30     return __callback(*args, **kwargs)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/uvicorn/main.py", line 403, in main
+2023-05-22 03:41:30     run(
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/uvicorn/main.py", line 568, in run
+2023-05-22 03:41:30     server.run()
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/uvicorn/server.py", line 59, in run
+2023-05-22 03:41:30     return asyncio.run(self.serve(sockets=sockets))
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/asyncio/runners.py", line 44, in run
+2023-05-22 03:41:30     return loop.run_until_complete(main)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/asyncio/base_events.py", line 647, in run_until_complete
+2023-05-22 03:41:30     return future.result()
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/uvicorn/server.py", line 66, in serve
+2023-05-22 03:41:30     config.load()
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/uvicorn/config.py", line 471, in load
+2023-05-22 03:41:30     self.loaded_app = import_from_string(self.app)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/uvicorn/importer.py", line 21, in import_from_string
+2023-05-22 03:41:30     module = importlib.import_module(module_str)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/importlib/__init__.py", line 127, in import_module
+2023-05-22 03:41:30     return _bootstrap._gcd_import(name[level:], package, level)
+2023-05-22 03:41:30   File "<frozen importlib._bootstrap>", line 1030, in _gcd_import
+2023-05-22 03:41:30   File "<frozen importlib._bootstrap>", line 1007, in _find_and_load
+2023-05-22 03:41:30   File "<frozen importlib._bootstrap>", line 986, in _find_and_load_unlocked
+2023-05-22 03:41:30   File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+2023-05-22 03:41:30   File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+2023-05-22 03:41:30   File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+2023-05-22 03:41:30   File "/app/main.py", line 3, in <module>
+2023-05-22 03:41:30     from app import app
+2023-05-22 03:41:30   File "/app/app.py", line 11, in <module>
+2023-05-22 03:41:30     client.connect()
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/opcua/client/client.py", line 272, in connect
+2023-05-22 03:41:30     self.connect_socket()
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/opcua/client/client.py", line 307, in connect_socket
+2023-05-22 03:41:30     self.uaclient.connect_socket(self.server_url.hostname, self.server_url.port)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/opcua/client/ua_client.py", line 266, in connect_socket
+2023-05-22 03:41:30     return self._uasocket.connect_socket(host, port)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/site-packages/opcua/client/ua_client.py", line 155, in connect_socket
+2023-05-22 03:41:30     sock = socket.create_connection((host, port), timeout=self.timeout)
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/socket.py", line 844, in create_connection
+2023-05-22 03:41:30     raise err
+2023-05-22 03:41:30   File "/usr/local/lib/python3.9/socket.py", line 832, in create_connection
+2023-05-22 03:41:30     sock.connect(sa)
+2023-05-22 03:41:30 OSError: [Errno 99] Cannot assign requested address 
