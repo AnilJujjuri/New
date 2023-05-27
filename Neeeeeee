@@ -152,3 +152,15 @@ fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> 
 
             match status_code {
 
+ > [4/4] RUN cargo build:
+#9 0.718     Updating crates.io index
+#9 182.8 error: failed to select a version for `hostname`.
+#9 182.8     ... required by package `opc-ua v0.1.0 (/app)`
+#9 182.8 versions that meet the requirements `^0.3.1` are: 0.3.1
+#9 182.8
+#9 182.8 the package `opc-ua` depends on `hostname`, with features: `client` but `hostname` does not have these features.
+#9 182.8
+#9 182.8
+#9 182.8 failed to select a version for `hostname` which could resolve this conflict
+------
+executor failed running [/bin/sh -c cargo build]: exit code: 101
