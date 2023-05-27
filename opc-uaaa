@@ -6,12 +6,10 @@ use opcua::types::string::*;
 use opcua::types::service_types::*;
 use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
 use opcua::types::extension_object::{ExtensionObject};
-use hostname
 
 
 fn main() {
     let mut client = ClientBuilder::new()
-    hostname::get_hostname;
         .application_name("RUST-OPCUA-Client")
         .application_uri("urn:RustClient")
         .create_sample_keypair(true)
@@ -20,11 +18,11 @@ fn main() {
         .client().unwrap();
     
     println!("Client created");
-    
+
     // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
     // the endpoint url, security policy, message security mode and user token policy.
     let endpoint: EndpointDescription = (
-        "opc.tcp://hostname.lnties.com:53530/OPCUA/SimulationServer",
+        "opc.tcp://MYTSL02384.lnties.com:53530/OPCUA/SimulationServer",
         "None",
         MessageSecurityMode::None,
         UserTokenPolicy::anonymous()
