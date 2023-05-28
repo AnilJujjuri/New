@@ -35,3 +35,18 @@
 #9 301.4 For more information about an error, try `rustc --explain E0425`.
 #9 301.4 warning: `opc-ua` (bin "opc-ua") generated 1 warning
 #9 301.4 error: could not compile `opc-ua` due to 3 previous errors; 1 warning emitted
+
+use opcua::types::{EndpointDescription, MessageSecurityMode, UserTokenPolicy};
+use std::env::hostname;
+
+struct MyEndpoint {
+    endpoint_url: String,
+    // Other fields
+}
+
+let endpoint: EndpointDescription = MyEndpoint {
+    endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname().unwrap()),
+    // Other field values
+}.into();
+
+
