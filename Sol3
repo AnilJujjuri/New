@@ -1,0 +1,104 @@
+use std::sync::Arc;
+use opcua::client::prelude::*;
+use opcua::sync::*;
+use opcua::types::data_value::DataValue;
+use opcua::types::string::UAString;
+use opcua::types::service_types::*;
+use opcua::types::{ExpandedNodeId, NodeId};
+use opcua::types::extension_object::ExtensionObject;
+use hostname::get_hostname;
+
+fn main() {
+    let hostname = get_hostname().unwrap_or_else(|| "localhost".to_string());
+    println!("Hostname: {}", hostname);
+
+    let mut client = ClientBuilder::new()
+        .application_name("RUST-OPCUA-Client")
+        .application_uri("urn:RustClient")
+        .create_sample_keypair(true)
+        .trust_server_certs(true)
+        .session_retry_limit(3)
+        .client()
+        .unwrap();
+
+    println!("Client created");
+
+    let endpoint = EndpointDescription {
+        endpoint_url: UAString::from(&format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname)),
+        security_policy_uri: UAString::from("None"),
+        security_mode: MessageSecurityMode::None,
+        server: ApplicationDescription {
+            application_uri: UAString::null(),
+            product_uri: UAString::null(),
+            application_name: LocalizedText::null(),
+            application_type: ApplicationType::Server,
+            gateway_server_uri: UAString::null(),
+            discovery_profile_uri: UAString::null(),
+            discovery_urls: Vec::new(),
+        },
+        server_certificate: None,
+        user_identity_tokens: vec![UserTokenPolicy::anonymous()],
+        transport_profile_uri: UAString::null(),
+        security_level: 0,
+    };
+
+    let session = client
+        .connect_to_endpoint(endpoint, IdentityToken::Anonymous)
+        .unwrap();
+
+    println!("Session created");
+
+    if subscribe_to_values(session.clone()).is_ok() {
+        println!("Subscribed");
+        let _ = Session::run(session);
+    } else {
+        println!("Error creating subscription");
+    }
+}
+
+fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
+    let session = session.write();
+
+    let subscription_id = session.create_subscription(
+        2000.0,
+        10,
+        30,
+        0,
+        0,
+        true,
+        DataChangeCallback::new(|changed_monitored_items| {
+            println!("Data change from server:");
+            changed_monitored_items.iter().for_each(|item| print_value(item));
+        }),
+    )?;
+
+    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003, 1008, 1009, 1010]
+        .iter()
+        .map(|v| NodeId::new(3, *v).into())
+        .collect();
+
+    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
+
+    let status_code = session.write(&[WriteValue {
+        node_id: NodeId::new(3, 1012),
+        value: DataValue::value_only(20),
+        attribute_id: 7,
+        index_range: UAString::null(),
+    }]);
+
+    match status_code {
+        Ok(_) => println!("Value written successfully"),
+        Err(status_code) => {
+            println!("Error writing to node: {:?}", status_code);
+            match status_code {
+                StatusCode::BadSessionClosed => {
+                    println!("Session was closed by the client");
+                }
+                _ => {
+                    // Handle other error codes here
+                }
+            }
+        }
+    }
+
+    println!("Created");
