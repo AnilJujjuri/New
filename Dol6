@@ -1,166 +1,145 @@
-use std::sync::Arc;
-
-use opcua::client::prelude::*;
-
-use opcua::sync::*;
-
-use opcua::types::data_value::DataValue;
-
-use opcua::types::string::UAString;
-
-use opcua::types::service_types::*;
-
-use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-
-use opcua::types::extension_object::ExtensionObject;
-
-use opcua::prelude::ByteString;
-
-use hostname::get_hostname;
-
-fn main() {
-
-    let hostname = get_hostname().unwrap();
-
-    let mut client = ClientBuilder::new()
-
-        .application_name("RUST-OPCUA-Client")
-
-        .application_uri("urn:RustClient")
-
-        .create_sample_keypair(true)
-
-        .trust_server_certs(true)
-
-        .session_retry_limit(3)
-
-        .build()
-
-        .unwrap();
-
-    println!("Client created");
-
-    // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
-
-    // the endpoint url, security policy, message security mode and user token policy.
-
-    let endpoint = EndpointDescription {
-
-        endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
-
-        security_policy_uri: "None".to_string(),
-
-        security_mode: MessageSecurityMode::None,
-
-        server_certificate: ByteString::null(),
-
-        server_application_uri: UAString::null(),
-
-        user_identity_tokens: vec![UserTokenPolicy::anonymous()],
-
-        transport_profile_uri: UAString::null(),
-
-        security_level: None,
-
-    };
-
-    // Create the session
-
-    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();
-
-    println!("Session created");
-
-    // Create a subscription and monitored items
-
-    if subscribe_to_values(session.clone()).is_ok() {
-
-        println!("Subscribed");
-
-        let _ = Session::run(session);
-
-    } else {
-
-        println!("Error creating subscription");
-
-    }
-
-}
-
-fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
-
-    let session = session.write().unwrap();
-
-    // Create a subscription polling every 2s with a callback
-
-    let subscription_id = session.create_subscription(
-
-        2000.0,
-
-        10,
-
-        30,
-
-        0,
-
-        0,
-
-        true,
-
-        DataChangeCallback::new(|changed_monitored_items| {
-
-            println!("Data change from server:");
-
-            changed_monitored_items.iter().for_each(|item| print_value(item));
-
-        }),
-
-    )?;
-
-    // Create some monitored items
-
-    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003, 1008, 1009, 1010]
-
-        .iter()
-
-        .map(|v| MonitoredItemCreateRequest {
-
-            item_to_monitor: ReadValueId {
-
-                node_id: NodeId::new(3, *v),
-
-                attribute_id: AttributeId::Value,
-
-                index_range: UAString::null(),
-
-                data_encoding: QualifiedName::null(),
-
-            },
-
-            monitoring_mode: MonitoringMode::Reporting,
-
-            requested_parameters: MonitoringParameters {
-
-                client_handle: 1,
-
-                sampling_interval: 0.0,
-
-                filter: ExtensionObject::null(),
-
-                queue_size: 1,
-
-                discard_oldest: true,
-
-            },
-
-        })
-
-        .collect();
-
-    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
-
-    let status_code = session.write(&[WriteValue {
-
-        node_id: NodeId::new(3, 1012),
-
-       
-
+ error: expected `;`, found keyword `let`
+#9 303.0    --> src/main.rs:189:40
+#9 303.0     |
+#9 303.0 189 |     let node_id = &item.item_to_monitor
+#9 303.0     |                                        ^ help: add `;` here
+#9 303.0 190 |    let data_value = item.last_value();
+#9 303.0     |    --- unexpected token
+#9 303.0
+#9 303.1 error[E0432]: unresolved import `hostname::get_hostname`
+#9 303.1   --> src/main.rs:19:5
+#9 303.1    |
+#9 303.1 19 | use hostname::get_hostname;
+#9 303.1    |     ^^^^^^^^^^^^^^^^^^^^^^ no `get_hostname` in the root
+#9 303.1
+#9 303.1 error[E0603]: module `prelude` is private
+#9 303.1   --> src/main.rs:17:12
+#9 303.1    |
+#9 303.1 17 | use opcua::prelude::ByteString;
+#9 303.1    |            ^^^^^^^ private module
+#9 303.1    |
+#9 303.1 note: the module `prelude` is defined here
+#9 303.1   --> /usr/local/cargo/registry/src/github.com-1ecc6299db9ec823/opcua-0.11.0/src/lib.rs:78:1
+#9 303.1    |
+#9 303.1 78 | mod prelude {
+#9 303.1    | ^^^^^^^^^^^
+#9 303.1
+#9 303.1 warning: unused import: `opcua::types::service_types::*`
+#9 303.1   --> src/main.rs:11:5
+#9 303.1    |
+#9 303.1 11 | use opcua::types::service_types::*;
+#9 303.1    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 303.1    |
+#9 303.1    = note: `#[warn(unused_imports)]` on by default
+#9 303.1
+#9 303.1 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
+#9 303.1   --> src/main.rs:13:20
+#9 303.1    |
+#9 303.1 13 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
+#9 303.1    |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
+#9 303.1
+#9 303.2 error[E0599]: no method named `build` found for struct `opcua::client::prelude::ClientBuilder` in the current scope   
+#9 303.2   --> src/main.rs:37:10
+#9 303.2    |
+#9 303.2 25 |       let mut client = ClientBuilder::new()
+#9 303.2    |  ______________________-
+#9 303.2 26 | |
+#9 303.2 27 | |         .application_name("RUST-OPCUA-Client")
+#9 303.2 28 | |
+#9 303.2 ...  |
+#9 303.2 36 | |
+#9 303.2 37 | |         .build()
+#9 303.2    | |         -^^^^^ method not found in `ClientBuilder`
+#9 303.2    | |_________|
+#9 303.2    |
+#9 303.2
+#9 303.3 error[E0308]: mismatched types
+#9 303.3   --> src/main.rs:49:23
+#9 303.3    |
+#9 303.3 49 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
+#9 303.3    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
+#9 303.3    |
+#9 303.3    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
+#9 303.3
+#9 303.3 error[E0308]: mismatched types
+#9 303.3   --> src/main.rs:51:30
+#9 303.3    |
+#9 303.3 51 |         security_policy_uri: "None".to_string(),
+#9 303.3    |                              ^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
+#9 303.3    |
+#9 303.3 help: call `Into::into` on this expression to convert `std::string::String` into `UAString`
+#9 303.3    |
+#9 303.3 51 |         security_policy_uri: "None".to_string().into(),
+#9 303.3    |                                                +++++++
+#9 303.3
+#9 303.3 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_application_uri`
+#9 303.3   --> src/main.rs:57:9
+#9 303.3    |
+#9 303.3 57 |         server_application_uri: UAString::null(),
+#9 303.3    |         ^^^^^^^^^^^^^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field
+#9 303.3    |
+#9 303.3    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
+#9 303.3
+#9 303.3 error[E0308]: mismatched types
+#9 303.3   --> src/main.rs:59:31
+#9 303.3    |
+#9 303.3 59 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
+#9 303.3    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
+#9 303.3    |
+#9 303.3    = note: expected enum `Option<Vec<_>>`
+#9 303.3             found struct `Vec<_>`
+#9 303.3    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)    
+#9 303.3
+#9 303.3 error[E0599]: no method named `unwrap` found for struct `lock_api::rwlock::RwLockWriteGuard<'_, parking_lot::raw_rwlock::RawRwLock, opcua::client::prelude::Session>` in the current scope
+#9 303.3   --> src/main.rs:91:35
+#9 303.3    |
+#9 303.3 91 |     let session = session.write().unwrap();
+#9 303.3    |                                   ^^^^^^ method not found in `RwLockWriteGuard<'_, RawRwLock, Session>`
+#9 303.3
+#9 303.3 error[E0308]: mismatched types
+#9 303.3    --> src/main.rs:131:31
+#9 303.3     |
+#9 303.3 131 |                 attribute_id: AttributeId::Value,
+#9 303.3     |                               ^^^^^^^^^^^^^^^^^^ expected `u32`, found `AttributeId`
+#9 303.3
+#9 303.3 error[E0433]: failed to resolve: use of undeclared type `Value`
+#9 303.3    --> src/main.rs:164:38
+#9 303.3     |
+#9 303.3 164 |         value: DataValue::value_only(Value::UInt32(20)),
+#9 303.3     |                                      ^^^^^ use of undeclared type `Value`
+#9 303.3     |
+#9 303.3 help: there is an enum variant `crate::AttributeId::Value` and 4 others; try using the variant's enum
+#9 303.3     |
+#9 303.3 164 |         value: DataValue::value_only(crate::AttributeId(20)),
+#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~
+#9 303.3 164 |         value: DataValue::value_only(crate::NodeAttributesMask(20)),
+#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~
+#9 303.3 164 |         value: DataValue::value_only(opcua::types::AttributeId(20)),
+#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~
+#9 303.3 164 |         value: DataValue::value_only(opcua::types::NodeAttributesMask(20)),
+#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#9 303.3
+#9 303.4 error[E0616]: field `item_to_monitor` of struct `opcua::client::prelude::MonitoredItem` is private
+#9 303.4    --> src/main.rs:189:25
+#9 303.4     |
+#9 303.4 189 |     let node_id = &item.item_to_monitor
+#9 303.4     |                         ^^^^^^^^^^^^^^^ private field
+#9 303.4     |
+#9 303.4 help: a method `item_to_monitor` also exists, call it with parentheses
+#9 303.4     |
+#9 303.4 189 |     let node_id = &item.item_to_monitor()
+#9 303.4     |                                        ++
+#9 303.4
+#9 303.4 error[E0308]: mismatched types
+#9 303.4   --> src/main.rs:63:25
+#9 303.4    |
+#9 303.4 63 |         security_level: None,
+#9 303.4    |                         ^^^^ expected `u8`, found `Option<_>`
+#9 303.4    |
+#9 303.4    = note: expected type `u8`
+#9 303.4               found enum `Option<_>`
+#9 303.4
+#9 303.4 Some errors have detailed explanations: E0308, E0432, E0433, E0560, E0599, E0603, E0616.
+#9 303.4 For more information about an error, try `rustc --explain E0308`.
+#9 303.4 warning: `opc-ua` (bin "opc-ua") generated 2 warnings
+#9 303.4 error: could not compile `opc-ua` due to 13 previous errors; 2 warnings emitted
