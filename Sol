@@ -1,70 +1,91 @@
-#9 268.8 error: expected `;`, found keyword `let`
-#9 268.8   --> src/main.rs:94:40
-#9 268.8    |
-#9 268.8 94 |     let node_id = &item.item_to_monitor
-#9 268.8    |                                        ^ help: add `;` here
-#9 268.8 95 |    let data_value = item.last_value();
-#9 268.8    |    --- unexpected token
-#9 268.8
-#9 268.8 error[E0432]: unresolved import `opcua::client::monitored_item`
-#9 268.8   --> src/main.rs:12:20
-#9 268.8    |
-#9 268.8 12 | use opcua::client::monitored_item::MonitoredItem;
-#9 268.8    |                    ^^^^^^^^^^^^^^ could not find `monitored_item` in `client`
-#9 268.8
-#9 268.9 error[E0432]: unresolved import `opcua::types::value`
-#9 268.9   --> src/main.rs:13:19
-#9 268.9    |
-#9 268.9 13 | use opcua::types::value::Value;
-#9 268.9    |                   ^^^^^ could not find `value` in `types`
-#9 268.9
-#9 268.9 error[E0432]: unresolved import `hostname::get_hostname`
-#9 268.9   --> src/main.rs:14:5
-#9 268.9    |
-#9 268.9 14 | use hostname::get_hostname;
-#9 268.9    |     ^^^^^^^^^^^^^^^^^^^^^^ no `get_hostname` in the root
-#9 268.9
-#9 268.9 error[E0603]: module `prelude` is private
-#9 268.9   --> src/main.rs:11:12
-#9 268.9    |
-#9 268.9 11 | use opcua::prelude::ByteString;
-#9 268.9    |            ^^^^^^^ private module
-#9 268.9    |
-#9 268.9 note: the module `prelude` is defined here
-#9 268.9   --> /usr/local/cargo/registry/src/github.com-1ecc6299db9ec823/opcua-0.11.0/src/lib.rs:78:1
-#9 268.9    |
-#9 268.9 78 | mod prelude {
-#9 268.9    | ^^^^^^^^^^^
-#9 268.9
-#9 268.9 warning: unused import: `opcua::types::extension_object::ExtensionObject`
-#9 268.9  --> src/main.rs:8:5
-#9 268.9   |
-#9 268.9 8 | use opcua::types::extension_object::ExtensionObject;
-#9 268.9   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 268.9   |
-#9 268.9   = note: `#[warn(unused_imports)]` on by default
-#9 268.9
-#9 269.1 error[E0308]: mismatched types
-#9 269.1   --> src/main.rs:38:17
-#9 269.1    |
-#9 269.1 38 |         server: None,
-#9 269.1    |                 ^^^^ expected `ApplicationDescription`, found `Option<_>`
-#9 269.1    |
-#9 269.1    = note: expected struct `opcua::types::ApplicationDescription`
-#9 269.1                 found enum `Option<_>`
-#9 269.1
-#9 269.1 error[E0616]: field `item_to_monitor` of struct `opcua::client::prelude::MonitoredItem` is private
-#9 269.1   --> src/main.rs:94:25
-#9 269.1    |
-#9 269.1 94 |     let node_id = &item.item_to_monitor
-#9 269.1    |                         ^^^^^^^^^^^^^^^ private field
-#9 269.1    |
-#9 269.1 help: a method `item_to_monitor` also exists, call it with parentheses
-#9 269.1    |
-#9 269.1 94 |     let node_id = &item.item_to_monitor()
-#9 269.1    |                                        ++
-#9 269.1
-#9 269.1 Some errors have detailed explanations: E0308, E0432, E0603, E0616.
-#9 269.1 For more information about an error, try `rustc --explain E0308`.
-#9 269.1 warning: `opc-ua` (bin "opc-ua") generated 1 warning
-#9 269.1 error: could not compile `opc-ua` due to 7 previous errors; 1 warning emitted
+use std::sync::Arc;
+use opcua::client::prelude::*;
+use opcua::sync::*;
+use opcua::types::data_value::{DataValue};
+use opcua::types::string::*;
+use opcua::types::service_types::*;
+use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
+use opcua::types::extension_object::{ExtensionObject};
+
+
+fn main() {
+    let mut client = ClientBuilder::new()
+        .application_name("RUST-OPCUA-Client")
+        .application_uri("urn:RustClient")
+        .create_sample_keypair(true)
+        .trust_server_certs(true)
+        .session_retry_limit(3)
+        .client().unwrap();
+    
+    println!("Client created");
+
+    // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
+    // the endpoint url, security policy, message security mode and user token policy.
+    let endpoint: EndpointDescription = (
+        endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap());
+        "None",
+        MessageSecurityMode::None,
+        UserTokenPolicy::anonymous()
+    ).into();
+
+    // Create the session
+    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();  
+ 
+    println!("Session created");
+
+    // Create a subscription and monitored items
+    if subscribe_to_values(session.clone()).is_ok() {
+        println!("Subscribed");
+        let _ = Session::run(session);
+    } else {
+        println!("Error creating subscription");
+    }
+}
+
+fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
+    let session = session.write();
+    // Create a subscription polling every 2s with a callback
+    let subscription_id = session.create_subscription(2000.0, 10, 30, 0, 0, true, DataChangeCallback::new(|changed_monitored_items| {
+        println!("Data change from server:");
+        changed_monitored_items.iter().for_each(|item| print_value(item));
+    }))?;
+    // Create some monitored items
+    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003,1008,1009,1010].iter()
+        .map(|v| NodeId::new(3, *v).into()).collect();
+    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
+
+    let status_code = session.write(&[WriteValue{
+        node_id: NodeId::new(3,1012),
+        value: DataValue::value_only(20),
+        attribute_id: 7,
+        index_range: UAString::null()
+    }]);    
+
+    match status_code {
+        Ok(_) => println!("Value written successfully"),
+        Err(status_code) => {
+            println!("Error writing to node: {:?}", status_code);
+            match status_code {
+                StatusCode::BadSessionClosed => {
+                    println!("Session was closed by the client");
+                }
+                _ => {
+                    // Handle other error codes here
+                }
+            }
+        }
+    }
+
+    println!("Created");
+    Ok(())
+}
+
+fn print_value(item: &MonitoredItem) {
+   let node_id = &item.item_to_monitor().node_id;
+   let data_value = item.last_value();
+   if let Some(ref value) = data_value.value {
+       println!("Item \"{}\", Value = {:?}", node_id, value);
+   } else {
+       println!("Item \"{}\", Value not found, error: {}", node_id, data_value.status.as_ref().unwrap());
+   }
+}
