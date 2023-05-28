@@ -1,52 +1,44 @@
-#9 301.3 error: expected type, found `{`
-#9 301.3   --> src/main.rs:25:23
-#9 301.3    |
-#9 301.3 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
-#9 301.3    |                     - ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 301.3    |                     | |
-#9 301.3    |                     | expected type
-#9 301.3    |                     | in this macro invocation
-#9 301.3    |                     | this macro call doesn't expand to a type
-#9 301.3    |                     help: try using a semicolon: `;`
-#9 301.3    |
-#9 301.3    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
-#9 301.3
-#9 301.3 error[E0432]: unresolved import `opcua::types::data_encoding`
-#9 301.3   --> src/main.rs:22:23
-#9 301.3    |
-#9 301.3 22 |     use opcua::types::data_encoding::ByteString;
-#9 301.3    |                       ^^^^^^^^^^^^^ could not find `data_encoding` in `types`
-#9 301.3
-#9 301.4 error[E0425]: cannot find value `endpoint_url` in this scope
-#9 301.4   --> src/main.rs:25:9
-#9 301.4    |
-#9 301.4 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
-#9 301.4    |         ^^^^^^^^^^^^ expecting a type here because of type ascription
-#9 301.4
-#9 301.4 warning: unused import: `opcua::types::extension_object::ExtensionObject`
-#9 301.4  --> src/main.rs:7:5
-#9 301.4   |
-#9 301.4 7 | use opcua::types::extension_object::ExtensionObject;
-#9 301.4   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 301.4   |
-#9 301.4   = note: `#[warn(unused_imports)]` on by default
-#9 301.4
-#9 301.4 Some errors have detailed explanations: E0425, E0432.
-#9 301.4 For more information about an error, try `rustc --explain E0425`.
-#9 301.4 warning: `opc-ua` (bin "opc-ua") generated 1 warning
-#9 301.4 error: could not compile `opc-ua` due to 3 previous errors; 1 warning emitted
-
-use opcua::types::{EndpointDescription, MessageSecurityMode, UserTokenPolicy};
-use std::env::hostname;
-
-struct MyEndpoint {
-    endpoint_url: String,
-    // Other fields
-}
-
-let endpoint: EndpointDescription = MyEndpoint {
-    endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname().unwrap()),
-    // Other field values
-}.into();
-
-
+#8 296.3 error[E0432]: unresolved import `opcua::types::data_encoding`
+#8 296.3  --> src/main.rs:8:19
+#8 296.3   |
+#8 296.3 8 | use opcua::types::data_encoding::ByteString;
+#8 296.3   |                   ^^^^^^^^^^^^^ could not find `data_encoding` in `types`
+#8 296.3
+#8 296.3 error[E0432]: unresolved import `std::env::hostname`
+#8 296.3   --> src/main.rs:10:5
+#8 296.3    |
+#8 296.3 10 | use std::env::hostname;
+#8 296.3    |     ^^^^^^^^^^^^^^^^^^ no `hostname` in `env`
+#8 296.3
+#8 296.3 warning: unused import: `opcua::types::extension_object::ExtensionObject`
+#8 296.3  --> src/main.rs:7:5
+#8 296.3   |
+#8 296.3 7 | use opcua::types::extension_object::ExtensionObject;
+#8 296.3   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 296.3   |
+#8 296.3   = note: `#[warn(unused_imports)]` on by default
+#8 296.3
+#8 296.3 warning: unused imports: `MessageSecurityMode`, `UserTokenPolicy`
+#8 296.3  --> src/main.rs:9:41
+#8 296.3   |
+#8 296.3 9 | use opcua::types::{EndpointDescription, MessageSecurityMode, UserTokenPolicy};
+#8 296.3   |                                         ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^
+#8 296.3
+#8 296.5 error[E0277]: the trait bound `opcua::types::EndpointDescription: From<MyEndpoint>` is not satisfied
+#8 296.5   --> src/main.rs:33:3
+#8 296.5    |
+#8 296.5 33 | }.into();
+#8 296.5    |   ^^^^ the trait `From<MyEndpoint>` is not implemented for `opcua::types::EndpointDescription`
+#8 296.5    |
+#8 296.5    = help: the following other types implement trait `From<T>`:
+#8 296.5              <opcua::types::EndpointDescription as From<&'a str>>
+#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode)>>       
+#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Option<Vec<opcua::types::UserTokenPolicy>>)>>
+#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)>>
+#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>>
+#8 296.5    = note: required for `MyEndpoint` to implement `Into<opcua::types::EndpointDescription>`
+#8 296.5
+#8 296.5 Some errors have detailed explanations: E0277, E0432.
+#8 296.5 For more information about an error, try `rustc --explain E0277`.
+#8 296.5 warning: `opc-ua` (bin "opc-ua") generated 2 warnings
+#8 296.5 error: could not compile `opc-ua` due to 3 previous errors; 2 warnings emitted
