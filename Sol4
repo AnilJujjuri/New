@@ -1,180 +1,146 @@
-use std::sync::Arc;
-
-use opcua::client::prelude::*;
-
-use opcua::sync::*;
-
-use opcua::types::data_value::DataValue;
-
-use opcua::types::string::UAString;
-
-use opcua::types::service_types::*;
-
-use opcua::types::extension_object::ExtensionObject;
-
-fn main() {
-
-    let hostname = hostname::get().unwrap_or_else(|| "localhost".to_string());
-
-    println!("Hostname: {}", hostname);
-
-    let mut client = ClientBuilder::new()
-
-        .application_name("RUST-OPCUA-Client")
-
-        .application_uri("urn:RustClient")
-
-        .create_sample_keypair(true)
-
-        .trust_server_certs(true)
-
-        .session_retry_limit(3)
-
-        .client()
-
-        .unwrap();
-
-    println!("Client created");
-
-    let endpoint = EndpointDescription {
-
-        endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
-
-        security_policy_uri: "None".to_string(),
-
-        security_mode: MessageSecurityMode::None,
-
-        server_certificate: None,
-
-        server_application_uri: UAString::null(),
-
-        user_identity_tokens: vec![UserTokenPolicy::anonymous()],
-
-        transport_profile_uri: None,
-
-        security_level: None,
-
-        server_discovery_configuration: Some(ServerDiscoveryConfiguration {
-
-            discovery_profile_uri: UAString::null(),
-
-            gateway_server_uri: UAString::null(),
-
-            discovery_urls: Some(vec![]),
-
-        }),
-
-    };
-
-    let session = client
-
-        .connect_to_endpoint(endpoint, IdentityToken::Anonymous)
-
-        .unwrap();
-
-    println!("Session created");
-
-    if subscribe_to_values(session.clone()).is_ok() {
-
-        println!("Subscribed");
-
-        let _ = Session::run(session);
-
-    } else {
-
-        println!("Error creating subscription");
-
-    }
-
-}
-
-fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
-
-    let session = session.write();
-
-    let subscription_id = session.create_subscription(
-
-        2000.0,
-
-        10,
-
-        30,
-
-        0,
-
-        0,
-
-        true,
-
-        DataChangeCallback::new(|changed_monitored_items| {
-
-            println!("Data change from server:");
-
-            changed_monitored_items.iter().for_each(|item| print_value(item));
-
-        }),
-
-    )?;
-
-    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003, 1008, 1009, 1010]
-
-        .iter()
-
-        .map(|v| NodeId::new(3, *v).into())
-
-        .collect();
-
-    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
-
-    let status_code = session.write(&[WriteValue {
-
-        node_id: NodeId::new(3, 1012),
-
-        value: DataValue::value_only(20),
-
-        attribute_id: AttributeId::Value,
-
-        index_range: UAString::null(),
-
-    }]);
-
-    match status_code {
-
-        Ok(_) => println!("Value written successfully"),
-
-        Err(status_code) => {
-
-            println!("Error writing to node: {:?}", status_code);
-
-            match status_code {
-
-                StatusCode::BadSessionClosed => {
-
-                    println!("Session was closed by the client");
-
-                }
-
-                _ => {
-
-                    // Handle other error codes here
-
-                }
-
-            }
-
-        }
-
-    }
-
-    println!("Created");
-
-    Ok(())
-
-}
-
-fn print_value(item: &MonitoredItem) {
-
-    let node_id = &item.item_to_monitor().node_id;
-
-    let data_value =
-
+#8 263.9 error[E0422]: cannot find struct, variant or union type `ServerDiscoveryConfiguration` in this scope      
+#8 263.9   --> src/main.rs:57:46
+#8 263.9    |
+#8 263.9 57 |         server_discovery_configuration: Some(ServerDiscoveryConfiguration {
+#8 263.9    |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: a struct with a similar name exists: `DiscoveryConfiguration`
+#8 263.9    |
+#8 263.9   ::: /usr/local/cargo/registry/src/github.com-1ecc6299db9ec823/opcua-0.11.0/src/types/service_types/discovery_configuration.rs:19:1
+#8 263.9    |
+#8 263.9 19 | pub struct DiscoveryConfiguration {
+#8 263.9    | --------------------------------- similarly named struct `DiscoveryConfiguration` defined here       
+#8 263.9 
+#8 263.9 warning: unused import: `opcua::types::service_types::*`
+#8 263.9   --> src/main.rs:11:5
+#8 263.9    |
+#8 263.9 11 | use opcua::types::service_types::*;
+#8 263.9    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 263.9    |
+#8 263.9    = note: `#[warn(unused_imports)]` on by default
+#8 263.9
+#8 263.9 warning: unused import: `opcua::types::extension_object::ExtensionObject`
+#8 263.9   --> src/main.rs:13:5
+#8 263.9    |
+#8 263.9 13 | use opcua::types::extension_object::ExtensionObject;
+#8 263.9    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 263.9
+#8 264.0 error[E0593]: closure is expected to take 1 argument, but it takes 0 arguments
+#8 264.0   --> src/main.rs:17:36
+#8 264.0    |
+#8 264.0 17 |     let hostname = hostname::get().unwrap_or_else(|| "localhost".to_string());
+#8 264.0    |                                    ^^^^^^^^^^^^^^ -- takes 0 arguments
+#8 264.0    |                                    |
+#8 264.0    |                                    expected closure that takes 1 argument
+#8 264.0    |
+#8 264.0 help: consider changing the closure to take and ignore the expected argument
+#8 264.0    |
+#8 264.0 17 |     let hostname = hostname::get().unwrap_or_else(|_| "localhost".to_string());
+#8 264.0    |                                                   ~~~
+#8 264.0
+#8 264.0 error[E0277]: `OsString` doesn't implement `std::fmt::Display`
+#8 264.0   --> src/main.rs:19:30
+#8 264.0    |
+#8 264.0 19 |     println!("Hostname: {}", hostname);
+#8 264.0    |                              ^^^^^^^^ `OsString` cannot be formatted with the default formatter      
+#8 264.0    |
+#8 264.0    = help: the trait `std::fmt::Display` is not implemented for `OsString`
+#8 264.0    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+#8 264.0    = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+#8 264.0
+#8 264.0 error[E0277]: `OsString` doesn't implement `std::fmt::Display`
+#8 264.0   --> src/main.rs:41:76
+#8 264.0    |
+#8 264.0 41 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
+#8 264.0    |                                                                            ^^^^^^^^ `OsString` cannot be formatted with the default formatter
+#8 264.0    |
+#8 264.0    = help: the trait `std::fmt::Display` is not implemented for `OsString`
+#8 264.0    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+#8 264.0    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+#8 264.0
+#8 264.0 error[E0308]: mismatched types
+#8 264.0   --> src/main.rs:41:23
+#8 264.0    |
+#8 264.0 41 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
+#8 264.0    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
+#8 264.0    |
+#8 264.0    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+#8 264.0
+#8 264.1 error[E0308]: mismatched types
+#8 264.1   --> src/main.rs:43:30
+#8 264.1    |
+#8 264.1 43 |         security_policy_uri: "None".to_string(),
+#8 264.1    |                              ^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
+#8 264.1    |
+#8 264.1 help: call `Into::into` on this expression to convert `std::string::String` into `UAString`
+#8 264.1    |
+#8 264.1 43 |         security_policy_uri: "None".to_string().into(),
+#8 264.1    |                                                +++++++
+#8 264.1
+#8 264.1 error[E0308]: mismatched types
+#8 264.1   --> src/main.rs:47:29
+#8 264.1    |
+#8 264.1 47 |         server_certificate: None,
+#8 264.1    |                             ^^^^ expected `ByteString`, found `Option<_>`
+#8 264.1    |
+#8 264.1    = note: expected struct `opcua::types::ByteString`
+#8 264.1                 found enum `Option<_>`
+#8 264.1 help: try wrapping the expression in `opcua::types::ByteString`
+#8 264.1    |
+#8 264.1 47 |         server_certificate: opcua::types::ByteString { value: None },
+#8 264.1    |                             +++++++++++++++++++++++++++++++++      +
+#8 264.1
+#8 264.1 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_application_uri`      
+#8 264.1   --> src/main.rs:49:9
+#8 264.1    |
+#8 264.1 49 |         server_application_uri: UAString::null(),
+#8 264.1    |         ^^^^^^^^^^^^^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field
+#8 264.1    |
+#8 264.1    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
+#8 264.1
+#8 264.1 error[E0308]: mismatched types
+#8 264.1   --> src/main.rs:51:31
+#8 264.1    |
+#8 264.1 51 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
+#8 264.1    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
+#8 264.1    |
+#8 264.1    = note: expected enum `Option<Vec<_>>`
+#8 264.1             found struct `Vec<_>`
+#8 264.1    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)
+#8 264.1
+#8 264.1 error[E0308]: mismatched types
+#8 264.1   --> src/main.rs:53:32
+#8 264.1    |
+#8 264.1 53 |         transport_profile_uri: None,
+#8 264.1    |                                ^^^^ expected `UAString`, found `Option<_>`
+#8 264.1    |
+#8 264.1    = note: expected struct `UAString`
+#8 264.1                 found enum `Option<_>`
+#8 264.1
+#8 264.1 error[E0308]: mismatched types
+#8 264.1   --> src/main.rs:55:25
+#8 264.1    |
+#8 264.1 55 |         security_level: None,
+#8 264.1    |                         ^^^^ expected `u8`, found `Option<_>`
+#8 264.1    |
+#8 264.1    = note: expected type `u8`
+#8 264.1               found enum `Option<_>`
+#8 264.1
+#8 264.1 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_discovery_configuration`
+#8 264.1   --> src/main.rs:57:9
+#8 264.1    |
+#8 264.1 57 |         server_discovery_configuration: Some(ServerDiscoveryConfiguration {
+#8 264.1    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field  
+#8 264.1    |
+#8 264.1    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
+#8 264.1
+#8 264.1 error[E0308]: mismatched types
+#8 264.1    --> src/main.rs:135:23
+#8 264.1     |
+#8 264.1 135 |         attribute_id: AttributeId::Value,
+#8 264.1     |                       ^^^^^^^^^^^^^^^^^^ expected `u32`, found `AttributeId`
+#8 264.1
+#8 264.2 Some errors have detailed explanations: E0277, E0308, E0422, E0560, E0593.
+#8 264.2 For more information about an error, try `rustc --explain E0277`.
+#8 264.2 warning: `opc-ua` (bin "opc-ua") generated 2 warnings
+#8 264.2 error: could not compile `opc-ua` due to 13 previous errors; 2 warnings emitted
+------
+executor failed running [/bin/sh -c cargo build]: exit code: 101
