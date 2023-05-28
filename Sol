@@ -1,19 +1,16 @@
-#9 265.6 error[E0308]: mismatched types
-#9 265.6   --> src/main.rs:32:17
-#9 265.6    |
-#9 265.6 32 |         server: UAString::null(),
-#9 265.6    |                 ^^^^^^^^^^^^^^^^ expected `ApplicationDescription`, found `UAString`
-#9 265.6
-#9 265.7 error[E0308]: mismatched types
-#9 265.7   --> src/main.rs:33:31
-#9 265.7    |
-#9 265.7 33 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
-#9 265.7    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
-#9 265.7    |
-#9 265.7    = note: expected enum `Option<Vec<_>>`
-#9 265.7             found struct `Vec<_>`
-#9 265.7    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)    
-#9 265.7
-#9 265.7 For more information about this error, try `rustc --explain E0308`.
-#9 265.7 warning: `opc-ua` (bin "opc-ua") generated 1 warning
-#9 265.7 error: could not compile `opc-ua` due to 2 previous errors; 1 warning emitted
+error[E0308]: mismatched types
+#9 305.1   --> src/main.rs:30:29
+#9 305.1    |
+#9 305.1 30 |         server_certificate: None,
+#9 305.1    |                             ^^^^ expected `ByteString`, found `Option<_>`
+#9 305.1    |
+#9 305.1    = note: expected struct `opcua::types::ByteString`
+#9 305.1                 found enum `Option<_>`
+#9 305.1 help: try wrapping the expression in `opcua::types::ByteString`
+#9 305.1    |
+#9 305.1 30 |         server_certificate: opcua::types::ByteString { value: None },
+#9 305.1    |                             +++++++++++++++++++++++++++++++++      +
+#9 305.1
+#9 305.1 For more information about this error, try `rustc --explain E0308`.
+#9 305.1 warning: `opc-ua` (bin "opc-ua") generated 1 warning
+#9 305.1 error: could not compile `opc-ua` due to previous error; 1 warning emitted
