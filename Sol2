@@ -1,102 +1,57 @@
-#9 333.6 error[E0277]: the trait bound `opcua::types::EndpointDescription: From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not satisfied
-#9 333.6   --> src/main.rs:31:7
-#9 333.6    |
-#9 333.6 31 |     ).into();
-#9 333.6    |       ^^^^ the trait `From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not implemented for `opcua::types::EndpointDescription`
-#9 333.6    |
-#9 333.6    = help: the following other types implement trait `From<T>`:
-#9 333.6              <opcua::types::EndpointDescription as From<&'a str>>
-#9 333.6              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode)>>
-#9 333.6              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Option<Vec<opcua::types::UserTokenPolicy>>)>>
-#9 333.6              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)>>
-#9 333.6              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>>
-#9 333.6    = note: required for `(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)` to implement `Into<opcua::types::EndpointDescription>`
-#9 333.6
-#9 333.6 Some errors have detailed explanations: E0277, E0432.
-#9 333.6 For more information about an error, try `rustc --explain E0277`.
-#9 333.6 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
-
-
-
-let endpoint = EndpointDescription {
-        endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
-        security_policy_uri: "None".to_string(),
-        security_mode: MessageSecurityMode::None,
-        server_certificate: None,
-        server_application_uri: None,
-        user_identity_tokens: vec![UserTokenPolicy::anonymous()],
-        transport_profile_uri: None,
-        security_level: None,
-    };
- 254.9 error[E0308]: mismatched types
-#9 254.9   --> src/main.rs:27:23
-#9 254.9    |
-#9 254.9 27 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
-#9 254.9    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
-#9 254.9    |
-#9 254.9    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
-#9 254.9
-#9 254.9 error[E0308]: mismatched types
-#9 254.9   --> src/main.rs:28:30
-#9 254.9    |
-#9 254.9 28 |         security_policy_uri: "None".to_string(),
-#9 254.9    |                              ^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
-#9 254.9    |
-#9 254.9 help: call `Into::into` on this expression to convert `std::string::String` into `opcua::types::UAString` 
-#9 254.9    |
-#9 254.9 28 |         security_policy_uri: "None".to_string().into(),
-#9 254.9    |                                                +++++++
-#9 254.9
-#9 254.9 error[E0308]: mismatched types
-#9 254.9   --> src/main.rs:30:29
-#9 254.9    |
-#9 254.9 30 |         server_certificate: None,
-#9 254.9    |                             ^^^^ expected `ByteString`, found `Option<_>`
-#9 254.9    |
-#9 254.9    = note: expected struct `opcua::types::ByteString`
-#9 254.9                 found enum `Option<_>`
-#9 254.9 help: try wrapping the expression in `opcua::types::ByteString`
-#9 254.9    |
-#9 254.9 30 |         server_certificate: opcua::types::ByteString { value: None },
-#9 254.9    |                             +++++++++++++++++++++++++++++++++      +
-#9 254.9
-#9 254.9 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_application_uri`
-#9 254.9   --> src/main.rs:31:9
-#9 254.9    |
-#9 254.9 31 |         server_application_uri: None,
-#9 254.9    |         ^^^^^^^^^^^^^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field
-#9 254.9    |
-#9 254.9    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
-#9 254.9
-#9 254.9 error[E0308]: mismatched types
-#9 254.9   --> src/main.rs:32:31
-#9 254.9    |
-#9 254.9 32 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
-#9 254.9    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
-#9 254.9    |
-#9 254.9    = note: expected enum `Option<Vec<_>>`
-#9 254.9             found struct `Vec<_>`
-#9 254.9    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)
-#9 254.9
-#9 254.9 error[E0308]: mismatched types
-#9 254.9   --> src/main.rs:33:32
-#9 254.9    |
-#9 254.9 33 |         transport_profile_uri: None,
-#9 254.9    |                                ^^^^ expected `UAString`, found `Option<_>`
-#9 254.9    |
-#9 254.9    = note: expected struct `opcua::types::UAString`
-#9 254.9                 found enum `Option<_>`
-#9 254.9
-#9 254.9 error[E0308]: mismatched types
-#9 254.9   --> src/main.rs:34:25
-#9 254.9    |
-#9 254.9 34 |         security_level: None,
-#9 254.9    |                         ^^^^ expected `u8`, found `Option<_>`
-#9 254.9    |
-#9 254.9    = note: expected type `u8`
-#9 254.9               found enum `Option<_>`
-#9 254.9
-#9 254.9 Some errors have detailed explanations: E0308, E0432, E0560.
-#9 254.9 For more information about an error, try `rustc --explain E0308`.
-#9 254.9 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
-#9 254.9 error: could not compile `opc-ua` due to 8 previous errors; 4 warnings emitted
+#9 298.6 error: expected one of `)`, `,`, `.`, or `?`, found `;`
+#9 298.6   --> src/main.rs:26:85
+#9 298.6    |
+#9 298.6 26 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname);
+#9 298.6    |                     -                                                               ^
+#9 298.6    |                     |                                                               |
+#9 298.6    |                     |                                                               expected one of `)`, `,`, `.`, or `?`
+#9 298.6    |                     tried to parse a type due to this                               help: missing `,`
+#9 298.6 
+#9 298.6 error: expected type, found `{`
+#9 298.6   --> src/main.rs:26:23
+#9 298.6    |
+#9 298.6 26 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname);
+#9 298.6    |                     - ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 298.6    |                     | |
+#9 298.6    |                     | expected type
+#9 298.6    |                     | in this macro invocation
+#9 298.6    |                     | this macro call doesn't expand to a type
+#9 298.6    |                     help: try using a semicolon: `;`
+#9 298.6    |
+#9 298.6    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
+#9 298.6
+#9 298.6 error[E0425]: cannot find value `endpoint_url` in this scope
+#9 298.6   --> src/main.rs:26:9
+#9 298.6    |
+#9 298.6 26 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname);
+#9 298.6    |         ^^^^^^^^^^^^ expecting a type here because of type ascription
+#9 298.6
+#9 298.6 warning: unused import: `opcua::types::string::*`
+#9 298.6  --> src/main.rs:5:5
+#9 298.6   |
+#9 298.6 5 | use opcua::types::string::*;
+#9 298.6   |     ^^^^^^^^^^^^^^^^^^^^^^^
+#9 298.6   |
+#9 298.6   = note: `#[warn(unused_imports)]` on by default
+#9 298.6
+#9 298.6 warning: unused import: `opcua::types::service_types::*`
+#9 298.6  --> src/main.rs:6:5
+#9 298.6   |
+#9 298.6 6 | use opcua::types::service_types::*;
+#9 298.6   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 298.6
+#9 298.6 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
+#9 298.6  --> src/main.rs:7:20
+#9 298.6   |
+#9 298.6 7 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
+#9 298.6   |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
+#9 298.6
+#9 298.6 warning: unused import: `ExtensionObject`
+#9 298.6  --> src/main.rs:8:38
+#9 298.6   |
+#9 298.6 8 | use opcua::types::extension_object::{ExtensionObject};
+#9 298.6   |                                      ^^^^^^^^^^^^^^^
+#9 298.6 
+#9 298.7 For more information about this error, try `rustc --explain E0425`.
+#9 298.7 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
+#9 298.7 error: could not compile `opc-ua` due to 3 previous errors; 4 warnings emitted
