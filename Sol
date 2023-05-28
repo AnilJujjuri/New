@@ -1,23 +1,37 @@
-#8 273.0 error[E0308]: mismatched types
-#8 273.0   --> src/main.rs:30:29
-#8 273.0    |
-#8 273.0 30 |         server_certificate: Some(opcua::types::ByteString{value:None}),
-#8 273.0    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ByteString`, found `Option<ByteString>`
-#8 273.0    |
-#8 273.0    = note: expected struct `opcua::types::ByteString`
-#8 273.0                 found enum `Option<opcua::types::ByteString>`
-#8 273.0
-#8 273.0 For more information about this error, try `rustc --explain E0308`.
-#8 273.0 warning: `opc-ua` (bin "opc-ua") generated 1 warning
-#8 273.0 error: could not compile `opc-ua` due to previous error; 1 warning emitted
-
-
-use opcua::types::data_encoding::ByteString;
-
-let endpoint: EndpointDescription = (
-    endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
-    "None",
-    MessageSecurityMode::None,
-    UserTokenPolicy::anonymous(),
-    opcua::types::ByteString::null(), // Set server_certificate to null
-).into();
+#9 301.3 error: expected type, found `{`
+#9 301.3   --> src/main.rs:25:23
+#9 301.3    |
+#9 301.3 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
+#9 301.3    |                     - ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 301.3    |                     | |
+#9 301.3    |                     | expected type
+#9 301.3    |                     | in this macro invocation
+#9 301.3    |                     | this macro call doesn't expand to a type
+#9 301.3    |                     help: try using a semicolon: `;`
+#9 301.3    |
+#9 301.3    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
+#9 301.3
+#9 301.3 error[E0432]: unresolved import `opcua::types::data_encoding`
+#9 301.3   --> src/main.rs:22:23
+#9 301.3    |
+#9 301.3 22 |     use opcua::types::data_encoding::ByteString;
+#9 301.3    |                       ^^^^^^^^^^^^^ could not find `data_encoding` in `types`
+#9 301.3
+#9 301.4 error[E0425]: cannot find value `endpoint_url` in this scope
+#9 301.4   --> src/main.rs:25:9
+#9 301.4    |
+#9 301.4 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
+#9 301.4    |         ^^^^^^^^^^^^ expecting a type here because of type ascription
+#9 301.4
+#9 301.4 warning: unused import: `opcua::types::extension_object::ExtensionObject`
+#9 301.4  --> src/main.rs:7:5
+#9 301.4   |
+#9 301.4 7 | use opcua::types::extension_object::ExtensionObject;
+#9 301.4   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 301.4   |
+#9 301.4   = note: `#[warn(unused_imports)]` on by default
+#9 301.4
+#9 301.4 Some errors have detailed explanations: E0425, E0432.
+#9 301.4 For more information about an error, try `rustc --explain E0425`.
+#9 301.4 warning: `opc-ua` (bin "opc-ua") generated 1 warning
+#9 301.4 error: could not compile `opc-ua` due to 3 previous errors; 1 warning emitted
