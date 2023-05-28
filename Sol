@@ -1,91 +1,19 @@
-use std::sync::Arc;
-use opcua::client::prelude::*;
-use opcua::sync::*;
-use opcua::types::data_value::{DataValue};
-use opcua::types::string::*;
-use opcua::types::service_types::*;
-use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-use opcua::types::extension_object::{ExtensionObject};
-
-
-fn main() {
-    let mut client = ClientBuilder::new()
-        .application_name("RUST-OPCUA-Client")
-        .application_uri("urn:RustClient")
-        .create_sample_keypair(true)
-        .trust_server_certs(true)
-        .session_retry_limit(3)
-        .client().unwrap();
-    
-    println!("Client created");
-
-    // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
-    // the endpoint url, security policy, message security mode and user token policy.
-    let endpoint: EndpointDescription = (
-        endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap());
-        "None",
-        MessageSecurityMode::None,
-        UserTokenPolicy::anonymous()
-    ).into();
-
-    // Create the session
-    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();  
- 
-    println!("Session created");
-
-    // Create a subscription and monitored items
-    if subscribe_to_values(session.clone()).is_ok() {
-        println!("Subscribed");
-        let _ = Session::run(session);
-    } else {
-        println!("Error creating subscription");
-    }
-}
-
-fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
-    let session = session.write();
-    // Create a subscription polling every 2s with a callback
-    let subscription_id = session.create_subscription(2000.0, 10, 30, 0, 0, true, DataChangeCallback::new(|changed_monitored_items| {
-        println!("Data change from server:");
-        changed_monitored_items.iter().for_each(|item| print_value(item));
-    }))?;
-    // Create some monitored items
-    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003,1008,1009,1010].iter()
-        .map(|v| NodeId::new(3, *v).into()).collect();
-    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
-
-    let status_code = session.write(&[WriteValue{
-        node_id: NodeId::new(3,1012),
-        value: DataValue::value_only(20),
-        attribute_id: 7,
-        index_range: UAString::null()
-    }]);    
-
-    match status_code {
-        Ok(_) => println!("Value written successfully"),
-        Err(status_code) => {
-            println!("Error writing to node: {:?}", status_code);
-            match status_code {
-                StatusCode::BadSessionClosed => {
-                    println!("Session was closed by the client");
-                }
-                _ => {
-                    // Handle other error codes here
-                }
-            }
-        }
-    }
-
-    println!("Created");
-    Ok(())
-}
-
-fn print_value(item: &MonitoredItem) {
-   let node_id = &item.item_to_monitor().node_id;
-   let data_value = item.last_value();
-   if let Some(ref value) = data_value.value {
-       println!("Item \"{}\", Value = {:?}", node_id, value);
-   } else {
-       println!("Item \"{}\", Value not found, error: {}", node_id, data_value.status.as_ref().unwrap());
-   }
-}
+#8 276.6 error: expected type, found `{`
+#8 276.6   --> src/main.rs:25:23
+#8 276.6    |
+#8 276.6 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
+#8 276.6    |                     - ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 276.6    |                     | |
+#8 276.6    |                     | expected type
+#8 276.6    |                     | in this macro invocation
+#8 276.6    |                     | this macro call doesn't expand to a type
+#8 276.6    |                     help: try using a semicolon: `;`
+#8 276.6    |
+#8 276.6    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
+#8 276.6
+#8 276.7 error[E0425]: cannot find value `endpoint_url` in this scope
+#8 276.7   --> src/main.rs:25:9
+#8 276.7    |
+#8 276.7 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
+#8 276.7    |         ^^^^^^^^^^^^ expecting a type here because of type ascription
+#8 276.7
