@@ -1,0 +1,61 @@
+use std::sync::Arc;
+use opcua::client::prelude::*;
+use opcua::sync::*;
+use opcua::types::data_value::DataValue;
+use opcua::types::string::UAString;
+use opcua::types::service_types::{EndpointDescription, UserTokenPolicy};
+use opcua::types::NodeId;
+use opcua::types::service_types::MessageSecurityMode;
+use opcua::types::service_types::TimestampsToReturn;
+use opcua::types::request_header::IdentityToken;
+use opcua::types::write_value::WriteValue;
+use opcua::types::monitored_item::MonitoredItem;
+use opcua::prelude::*;
+
+use hostname::get_hostname;
+
+fn main() {
+    let mut client = ClientBuilder::new()
+        .application_name("RUST-OPCUA-Client")
+        .application_uri("urn:RustClient")
+        .create_sample_keypair(true)
+        .trust_server_certs(true)
+        .session_retry_limit(3)
+        .client().unwrap();
+    
+    println!("Client created");
+
+    let hostname = get_hostname().unwrap_or_else(|| "localhost".to_string());
+
+    // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
+    // the endpoint url, security policy, message security mode and user token policy.
+    let endpoint: EndpointDescription = (
+        format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
+        "None",
+        MessageSecurityMode::None,
+        vec![UserTokenPolicy::anonymous()],
+    ).into();
+
+    // Create the session
+    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();  
+ 
+    println!("Session created");
+
+    // Create a subscription and monitored items
+    if subscribe_to_values(session.clone()).is_ok() {
+        println!("Subscribed");
+        let _ = Session::run(session);
+    } else {
+        println!("Error creating subscription");
+    }
+}
+
+fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
+    let session = session.write();
+    // Create a subscription polling every 2s with a callback
+    let subscription_id = session.create_subscription(2000.0, 10, 30, 0, 0, true, DataChangeCallback::new(|changed_monitored_items| {
+        println!("Data change from server:");
+        changed_monitored_items.iter().for_each(|item| print_value(item));
+    }))?;
+    // Create some monitored items
+    let items_to_create: Vec<Monitored
