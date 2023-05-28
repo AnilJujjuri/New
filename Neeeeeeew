@@ -1,0 +1,20 @@
+let endpoint = EndpointDescription {
+
+    endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap().to_string_lossy()),
+
+    security_policy_uri: "None".into(),
+
+    security_mode: MessageSecurityMode::None,
+
+    server_certificate: None,
+
+    security_level: 0,
+
+    server_uri: UAString::null(),
+
+    user_identity_tokens: vec![UserTokenPolicy::anonymous()],
+
+    transport_profile_uri: UAString::null(),
+
+};
+
