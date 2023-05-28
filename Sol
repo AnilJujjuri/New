@@ -1,53 +1,34 @@
-use std::env;
-use std::sync::Arc;
-use opcua::client::prelude::*;
-use opcua::sync::*;
-use opcua::types::data_value::DataValue;
-use opcua::types::string::UAString;
-use opcua::types::service_types::WriteValue;
-use opcua::types::{ExpandedNodeId, NodeId};
-use opcua::types::extension_object::ExtensionObject;
-
-fn main() {
-    // Retrieve the hostname from the command line arguments
-    let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
-        println!("Usage: ./program <hostname>");
-        return;
-    }
-    let hostname = &args[1];
-
-    let mut client = ClientBuilder::new()
-        .application_name("RUST-OPCUA-Client")
-        .application_uri("urn:RustClient")
-        .create_sample_keypair(true)
-        .trust_server_certs(true)
-        .session_retry_limit(3)
-        .client()
-        .unwrap();
-    
-    println!("Client created");
-
-    // Create an endpoint using the provided hostname
-    let endpoint: EndpointDescription = (
-        format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
-        "None",
-        MessageSecurityMode::None,
-        UserTokenPolicy::anonymous()
-    ).into();
-
-    // Create the session
-    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();  
- 
-    println!("Session created");
-
-    // Create a subscription and monitored items
-    if subscribe_to_values(session.clone()).is_ok() {
-        println!("Subscribed");
-        let _ = Session::run(session);
-    } else {
-        println!("Error creating subscription");
-    }
-}
-
-// Rest of the code remains the same...
+9 439.7    Compiling opc-ua v0.1.0 (/app)
+#9 439.9 warning: unused import: `ExpandedNodeId`
+#9 439.9  --> src/main.rs:8:20
+#9 439.9   |
+#9 439.9 8 | use opcua::types::{ExpandedNodeId, NodeId};
+#9 439.9   |                    ^^^^^^^^^^^^^^
+#9 439.9   |
+#9 439.9   = note: `#[warn(unused_imports)]` on by default
+#9 439.9
+#9 439.9 warning: unused import: `opcua::types::extension_object::ExtensionObject`
+#9 439.9  --> src/main.rs:9:5
+#9 439.9   |
+#9 439.9 9 | use opcua::types::extension_object::ExtensionObject;
+#9 439.9   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 439.9
+#9 440.1 error[E0277]: the trait bound `opcua::types::EndpointDescription: From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not satisfied
+#9 440.1   --> src/main.rs:37:7
+#9 440.1    |
+#9 440.1 37 |     ).into();
+#9 440.1    |       ^^^^ the trait `From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not implemented for `opcua::types::EndpointDescription`
+#9 440.1    |
+#9 440.1    = help: the following other types implement trait `From<T>`:
+#9 440.1              <opcua::types::EndpointDescription as From<&'a str>>
+#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode)>>
+#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Option<Vec<opcua::types::UserTokenPolicy>>)>>
+#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)>>
+#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>>
+#9 440.1    = note: required for `(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)` to implement `Into<opcua::types::EndpointDescription>`
+#9 440.1
+#9 440.1 For more information about this error, try `rustc --explain E0277`.
+#9 440.1 warning: `opc-ua` (bin "opc-ua") generated 2 warnings
+#9 440.1 error: could not compile `opc-ua` due to previous error; 2 warnings emitted
+------
+executor failed running [/bin/sh -c cargo build]: exit code: 101
