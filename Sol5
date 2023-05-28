@@ -1,0 +1,79 @@
+use std::sync::Arc;
+use opcua::client::prelude::*;
+use opcua::sync::*;
+use opcua::types::data_value::DataValue;
+use opcua::types::string::UAString;
+use opcua::types::service_types::{EndpointDescription, UserTokenPolicy};
+use opcua::types::{NodeId, TimestampsToReturn};
+use opcua::types::extension_object::ExtensionObject;
+use opcua::types::service_types::WriteValue;
+use opcua::types::StatusCode;
+use opcua::prelude::ByteString;
+use opcua::client::monitored_item::MonitoredItem;
+use opcua::types::value::Value;
+use hostname::get_hostname;
+
+fn main() {
+    let hostname = get_hostname().unwrap();
+    let mut client = ClientBuilder::new()
+        .application_name("RUST-OPCUA-Client")
+        .application_uri("urn:RustClient")
+        .create_sample_keypair(true)
+        .trust_server_certs(true)
+        .session_retry_limit(3)
+        .client().unwrap();
+    
+    println!("Client created");
+
+    // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
+    // the endpoint url, security policy, message security mode and user token policy.
+    let endpoint: EndpointDescription = EndpointDescription {
+        endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname).into(),
+        security_policy_uri: "None".to_string().into(),
+        security_mode: MessageSecurityMode::None,
+        server_certificate: opcua::types::ByteString { value: None },
+        user_identity_tokens: Some(vec![UserTokenPolicy::anonymous()]),
+        transport_profile_uri: UAString::null(),
+        security_level: 0,
+        server: None,
+    };
+
+    // Create the session
+    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();  
+ 
+    println!("Session created");
+
+    // Create a subscription and monitored items
+    if subscribe_to_values(session.clone()).is_ok() {
+        println!("Subscribed");
+        let _ = Session::run(session);
+    } else {
+        println!("Error creating subscription");
+    }
+}
+
+fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
+    let session = session.write();
+    // Create a subscription polling every 2s with a callback
+    let subscription_id = session.create_subscription(2000.0, 10, 30, 0, 0, true, DataChangeCallback::new(|changed_monitored_items| {
+        println!("Data change from server:");
+        changed_monitored_items.iter().for_each(|item| print_value(item));
+    }))?;
+    // Create some monitored items
+    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003,1008,1009,1010].iter()
+        .map(|v| NodeId::new(3, *v).into()).collect();
+    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
+
+    let status_code = session.write(&[WriteValue{
+        node_id: NodeId::new(3,1012),
+        value: DataValue::value_only(Value::UInt32(20)),
+        attribute_id: 7,
+        index_range: UAString::null()
+    }]);    
+
+    match status_code {
+        Ok(_) => println!("Value written successfully"),
+        Err(status_code) => {
+            println!("Error writing to node: {:?}", status_code);
+            match status_code {
+                StatusCode::
