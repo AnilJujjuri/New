@@ -28,3 +28,75 @@ let endpoint = EndpointDescription {
         transport_profile_uri: None,
         security_level: None,
     };
+ 254.9 error[E0308]: mismatched types
+#9 254.9   --> src/main.rs:27:23
+#9 254.9    |
+#9 254.9 27 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
+#9 254.9    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
+#9 254.9    |
+#9 254.9    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+#9 254.9
+#9 254.9 error[E0308]: mismatched types
+#9 254.9   --> src/main.rs:28:30
+#9 254.9    |
+#9 254.9 28 |         security_policy_uri: "None".to_string(),
+#9 254.9    |                              ^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
+#9 254.9    |
+#9 254.9 help: call `Into::into` on this expression to convert `std::string::String` into `opcua::types::UAString` 
+#9 254.9    |
+#9 254.9 28 |         security_policy_uri: "None".to_string().into(),
+#9 254.9    |                                                +++++++
+#9 254.9
+#9 254.9 error[E0308]: mismatched types
+#9 254.9   --> src/main.rs:30:29
+#9 254.9    |
+#9 254.9 30 |         server_certificate: None,
+#9 254.9    |                             ^^^^ expected `ByteString`, found `Option<_>`
+#9 254.9    |
+#9 254.9    = note: expected struct `opcua::types::ByteString`
+#9 254.9                 found enum `Option<_>`
+#9 254.9 help: try wrapping the expression in `opcua::types::ByteString`
+#9 254.9    |
+#9 254.9 30 |         server_certificate: opcua::types::ByteString { value: None },
+#9 254.9    |                             +++++++++++++++++++++++++++++++++      +
+#9 254.9
+#9 254.9 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_application_uri`
+#9 254.9   --> src/main.rs:31:9
+#9 254.9    |
+#9 254.9 31 |         server_application_uri: None,
+#9 254.9    |         ^^^^^^^^^^^^^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field
+#9 254.9    |
+#9 254.9    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
+#9 254.9
+#9 254.9 error[E0308]: mismatched types
+#9 254.9   --> src/main.rs:32:31
+#9 254.9    |
+#9 254.9 32 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
+#9 254.9    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
+#9 254.9    |
+#9 254.9    = note: expected enum `Option<Vec<_>>`
+#9 254.9             found struct `Vec<_>`
+#9 254.9    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)
+#9 254.9
+#9 254.9 error[E0308]: mismatched types
+#9 254.9   --> src/main.rs:33:32
+#9 254.9    |
+#9 254.9 33 |         transport_profile_uri: None,
+#9 254.9    |                                ^^^^ expected `UAString`, found `Option<_>`
+#9 254.9    |
+#9 254.9    = note: expected struct `opcua::types::UAString`
+#9 254.9                 found enum `Option<_>`
+#9 254.9
+#9 254.9 error[E0308]: mismatched types
+#9 254.9   --> src/main.rs:34:25
+#9 254.9    |
+#9 254.9 34 |         security_level: None,
+#9 254.9    |                         ^^^^ expected `u8`, found `Option<_>`
+#9 254.9    |
+#9 254.9    = note: expected type `u8`
+#9 254.9               found enum `Option<_>`
+#9 254.9
+#9 254.9 Some errors have detailed explanations: E0308, E0432, E0560.
+#9 254.9 For more information about an error, try `rustc --explain E0308`.
+#9 254.9 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
+#9 254.9 error: could not compile `opc-ua` due to 8 previous errors; 4 warnings emitted
