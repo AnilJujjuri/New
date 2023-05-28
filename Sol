@@ -1,117 +1,70 @@
-#9 299.9 error: expected `;`, found keyword `let`
-#9 299.9    --> src/main.rs:100:40
-#9 299.9     |
-#9 299.9 100 |     let node_id = &item.item_to_monitor
-#9 299.9     |                                        ^ help: add `;` here
-#9 299.9 101 |    let data_value = item.last_value();
-#9 299.9     |    --- unexpected token
-#9 299.9
-#9 300.0 error[E0432]: unresolved import `hostname::get_hostname`
-#9 300.0  --> src/main.rs:9:5
-#9 300.0   |
-#9 300.0 9 | use hostname::get_hostname;
-#9 300.0   |     ^^^^^^^^^^^^^^^^^^^^^^ no `get_hostname` in the root
-#9 300.0
-#9 300.0 warning: unused import: `opcua::types::service_types::*`
-#9 300.0  --> src/main.rs:6:5
-#9 300.0   |
-#9 300.0 6 | use opcua::types::service_types::*;
-#9 300.0   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 300.0   |
-#9 300.0   = note: `#[warn(unused_imports)]` on by default
-#9 300.0
-#9 300.0 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
-#9 300.0  --> src/main.rs:7:20
-#9 300.0   |
-#9 300.0 7 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-#9 300.0   |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
-#9 300.0
-#9 300.0 warning: unused import: `opcua::types::extension_object::ExtensionObject`
-#9 300.0  --> src/main.rs:8:5
-#9 300.0   |
-#9 300.0 8 | use opcua::types::extension_object::ExtensionObject;
-#9 300.0   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 300.0
-#9 300.1 error[E0308]: mismatched types
-#9 300.1   --> src/main.rs:27:23
-#9 300.1    |
-#9 300.1 27 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
-#9 300.1    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
-#9 300.1    |
-#9 300.1    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
-#9 300.1
-#9 300.1 error[E0308]: mismatched types
-#9 300.1   --> src/main.rs:28:30
-#9 300.1    |
-#9 300.1 28 |         security_policy_uri: "None".to_string(),
-#9 300.1    |                              ^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
-#9 300.1    |
-#9 300.1 help: call `Into::into` on this expression to convert `std::string::String` into `UAString`
-#9 300.1    |
-#9 300.1 28 |         security_policy_uri: "None".to_string().into(),
-#9 300.1    |                                                +++++++
-#9 300.1
-#9 300.1 error[E0308]: mismatched types
-#9 300.1   --> src/main.rs:30:29
-#9 300.1    |
-#9 300.1 30 |         server_certificate: None,
-#9 300.1    |                             ^^^^ expected `ByteString`, found `Option<_>`
-#9 300.1    |
-#9 300.1    = note: expected struct `opcua::types::ByteString`
-#9 300.1                 found enum `Option<_>`
-#9 300.1 help: try wrapping the expression in `opcua::types::ByteString`
-#9 300.1    |
-#9 300.1 30 |         server_certificate: opcua::types::ByteString { value: None },
-#9 300.1    |                             +++++++++++++++++++++++++++++++++      +
-#9 300.1
-#9 300.1 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_application_uri`
-#9 300.1   --> src/main.rs:31:9
-#9 300.1    |
-#9 300.1 31 |         server_application_uri: None,
-#9 300.1    |         ^^^^^^^^^^^^^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field
-#9 300.1    |
-#9 300.1    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
-#9 300.1
-#9 300.1 error[E0308]: mismatched types
-#9 300.1   --> src/main.rs:32:31
-#9 300.1    |
-#9 300.1 32 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
-#9 300.1    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
-#9 300.1    |
-#9 300.1    = note: expected enum `Option<Vec<_>>`
-#9 300.1             found struct `Vec<_>`
-#9 300.1    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)    
-#9 300.1
-#9 300.1 error[E0308]: mismatched types
-#9 300.1   --> src/main.rs:33:32
-#9 300.1    |
-#9 300.1 33 |         transport_profile_uri: None,
-#9 300.1    |                                ^^^^ expected `UAString`, found `Option<_>`
-#9 300.1    |
-#9 300.1    = note: expected struct `UAString`
-#9 300.1                 found enum `Option<_>`
-#9 300.1
-#9 300.2 error[E0616]: field `item_to_monitor` of struct `opcua::client::prelude::MonitoredItem` is private
-#9 300.2    --> src/main.rs:100:25
-#9 300.2     |
-#9 300.2 100 |     let node_id = &item.item_to_monitor
-#9 300.2     |                         ^^^^^^^^^^^^^^^ private field
-#9 300.2     |
-#9 300.2 help: a method `item_to_monitor` also exists, call it with parentheses
-#9 300.2     |
-#9 300.2 100 |     let node_id = &item.item_to_monitor()
-#9 300.2     |                                        ++
-#9 300.2
-#9 300.2 error[E0308]: mismatched types
-#9 300.2   --> src/main.rs:34:25
-#9 300.2    |
-#9 300.2 34 |         security_level: None,
-#9 300.2    |                         ^^^^ expected `u8`, found `Option<_>`
-#9 300.2    |
-#9 300.2    = note: expected type `u8`
-#9 300.2               found enum `Option<_>`
-#9 300.2
-#9 300.2 Some errors have detailed explanations: E0308, E0432, E0560, E0616.
-#9 300.2 For more information about an error, try `rustc --explain E0308`.
-#9 300.2 warning: `opc-ua` (bin "opc-ua") generated 3 warnings
-#9 300.2 error: could not compile `opc-ua` due to 10 previous errors; 3 warnings emitted
+#9 268.8 error: expected `;`, found keyword `let`
+#9 268.8   --> src/main.rs:94:40
+#9 268.8    |
+#9 268.8 94 |     let node_id = &item.item_to_monitor
+#9 268.8    |                                        ^ help: add `;` here
+#9 268.8 95 |    let data_value = item.last_value();
+#9 268.8    |    --- unexpected token
+#9 268.8
+#9 268.8 error[E0432]: unresolved import `opcua::client::monitored_item`
+#9 268.8   --> src/main.rs:12:20
+#9 268.8    |
+#9 268.8 12 | use opcua::client::monitored_item::MonitoredItem;
+#9 268.8    |                    ^^^^^^^^^^^^^^ could not find `monitored_item` in `client`
+#9 268.8
+#9 268.9 error[E0432]: unresolved import `opcua::types::value`
+#9 268.9   --> src/main.rs:13:19
+#9 268.9    |
+#9 268.9 13 | use opcua::types::value::Value;
+#9 268.9    |                   ^^^^^ could not find `value` in `types`
+#9 268.9
+#9 268.9 error[E0432]: unresolved import `hostname::get_hostname`
+#9 268.9   --> src/main.rs:14:5
+#9 268.9    |
+#9 268.9 14 | use hostname::get_hostname;
+#9 268.9    |     ^^^^^^^^^^^^^^^^^^^^^^ no `get_hostname` in the root
+#9 268.9
+#9 268.9 error[E0603]: module `prelude` is private
+#9 268.9   --> src/main.rs:11:12
+#9 268.9    |
+#9 268.9 11 | use opcua::prelude::ByteString;
+#9 268.9    |            ^^^^^^^ private module
+#9 268.9    |
+#9 268.9 note: the module `prelude` is defined here
+#9 268.9   --> /usr/local/cargo/registry/src/github.com-1ecc6299db9ec823/opcua-0.11.0/src/lib.rs:78:1
+#9 268.9    |
+#9 268.9 78 | mod prelude {
+#9 268.9    | ^^^^^^^^^^^
+#9 268.9
+#9 268.9 warning: unused import: `opcua::types::extension_object::ExtensionObject`
+#9 268.9  --> src/main.rs:8:5
+#9 268.9   |
+#9 268.9 8 | use opcua::types::extension_object::ExtensionObject;
+#9 268.9   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 268.9   |
+#9 268.9   = note: `#[warn(unused_imports)]` on by default
+#9 268.9
+#9 269.1 error[E0308]: mismatched types
+#9 269.1   --> src/main.rs:38:17
+#9 269.1    |
+#9 269.1 38 |         server: None,
+#9 269.1    |                 ^^^^ expected `ApplicationDescription`, found `Option<_>`
+#9 269.1    |
+#9 269.1    = note: expected struct `opcua::types::ApplicationDescription`
+#9 269.1                 found enum `Option<_>`
+#9 269.1
+#9 269.1 error[E0616]: field `item_to_monitor` of struct `opcua::client::prelude::MonitoredItem` is private
+#9 269.1   --> src/main.rs:94:25
+#9 269.1    |
+#9 269.1 94 |     let node_id = &item.item_to_monitor
+#9 269.1    |                         ^^^^^^^^^^^^^^^ private field
+#9 269.1    |
+#9 269.1 help: a method `item_to_monitor` also exists, call it with parentheses
+#9 269.1    |
+#9 269.1 94 |     let node_id = &item.item_to_monitor()
+#9 269.1    |                                        ++
+#9 269.1
+#9 269.1 Some errors have detailed explanations: E0308, E0432, E0603, E0616.
+#9 269.1 For more information about an error, try `rustc --explain E0308`.
+#9 269.1 warning: `opc-ua` (bin "opc-ua") generated 1 warning
+#9 269.1 error: could not compile `opc-ua` due to 7 previous errors; 1 warning emitted
