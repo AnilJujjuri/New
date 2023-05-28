@@ -1,34 +1,18 @@
-9 439.7    Compiling opc-ua v0.1.0 (/app)
-#9 439.9 warning: unused import: `ExpandedNodeId`
-#9 439.9  --> src/main.rs:8:20
-#9 439.9   |
-#9 439.9 8 | use opcua::types::{ExpandedNodeId, NodeId};
-#9 439.9   |                    ^^^^^^^^^^^^^^
-#9 439.9   |
-#9 439.9   = note: `#[warn(unused_imports)]` on by default
-#9 439.9
-#9 439.9 warning: unused import: `opcua::types::extension_object::ExtensionObject`
-#9 439.9  --> src/main.rs:9:5
-#9 439.9   |
-#9 439.9 9 | use opcua::types::extension_object::ExtensionObject;
-#9 439.9   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 439.9
-#9 440.1 error[E0277]: the trait bound `opcua::types::EndpointDescription: From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not satisfied
-#9 440.1   --> src/main.rs:37:7
-#9 440.1    |
-#9 440.1 37 |     ).into();
-#9 440.1    |       ^^^^ the trait `From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not implemented for `opcua::types::EndpointDescription`
-#9 440.1    |
-#9 440.1    = help: the following other types implement trait `From<T>`:
-#9 440.1              <opcua::types::EndpointDescription as From<&'a str>>
-#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode)>>
-#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Option<Vec<opcua::types::UserTokenPolicy>>)>>
-#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)>>
-#9 440.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>>
-#9 440.1    = note: required for `(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)` to implement `Into<opcua::types::EndpointDescription>`
-#9 440.1
-#9 440.1 For more information about this error, try `rustc --explain E0277`.
-#9 440.1 warning: `opc-ua` (bin "opc-ua") generated 2 warnings
-#9 440.1 error: could not compile `opc-ua` due to previous error; 2 warnings emitted
-------
-executor failed running [/bin/sh -c cargo build]: exit code: 101
+#9 450.0 error[E0599]: no method named `unwrap` found for tuple `(std::string::String, &'static str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)` in the current scope
+#9 450.0   --> src/main.rs:39:7
+#9 450.0    |
+#9 450.0 33 |       let endpoint: EndpointDescription = (
+#9 450.0    |  _________________________________________-
+#9 450.0 34 | |         format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
+#9 450.0 35 | |         "None",
+#9 450.0 36 | |         MessageSecurityMode::None,
+#9 450.0 37 | |         vec![UserTokenPolicy::anonymous()],
+#9 450.0 38 | |
+#9 450.0 39 | |     ).unwrap();
+#9 450.0    | |      -^^^^^^ method not found in `(String, &str, MessageSecurityMode, Vec<UserTokenPolicy>)`
+#9 450.0    | |______|
+#9 450.0    |
+#9 450.0
+#9 450.1 For more information about this error, try `rustc --explain E0599`.
+#9 450.1 warning: `opc-ua` (bin "opc-ua") generated 3 warnings
+#9 450.1 error: could not compile `opc-ua` due to previous error; 3 warnings emitted
