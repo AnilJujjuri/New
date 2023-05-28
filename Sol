@@ -1,27 +1,42 @@
-error[E0277]: `OsString` doesn't implement `std::fmt::Display`
-#9 287.1   --> src/main.rs:25:62
-#9 287.1    |
-#9 287.1 25 |         format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
-#9 287.1    |                                                              ^^^^^^^^^^^^^^^^^^^^^^^^ `OsString` cannot be formatted with the default formatter
-#9 287.1    |
-#9 287.1    = help: the trait `std::fmt::Display` is not implemented for `OsString`
-#9 287.1    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
-#9 287.1    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
-#9 287.1
-#9 287.1 error[E0277]: the trait bound `opcua::types::EndpointDescription: From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not satisfied
-#9 287.1   --> src/main.rs:29:7
-#9 287.1    |
-#9 287.1 29 |     ).into();
-#9 287.1    |       ^^^^ the trait `From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not implemented for `opcua::types::EndpointDescription`
-#9 287.1    |
-#9 287.1    = help: the following other types implement trait `From<T>`:
-#9 287.1              <opcua::types::EndpointDescription as From<&'a str>>
-#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode)>>       
-#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Option<Vec<opcua::types::UserTokenPolicy>>)>>
-#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)>>
-#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>>
-#9 287.1    = note: required for `(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)` to implement `Into<opcua::types::EndpointDescription>`
-#9 287.1
-#9 287.1 For more information about this error, try `rustc --explain E0277`.
-#9 287.1 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
-#9 287.1 error: could not compile `opc-ua` due to 2 previous errors; 4 warnings emitted
+#9 263.5 error[E0308]: mismatched types
+#9 263.5   --> src/main.rs:26:23
+#9 263.5    |
+#9 263.5 26 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap().to_string_lossy()),
+#9 263.5    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
+#9 263.5    |
+#9 263.5    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
+#9 263.5
+#9 263.5 error[E0308]: mismatched types
+#9 263.5   --> src/main.rs:32:29
+#9 263.5    |
+#9 263.5 32 |         server_certificate: None,
+#9 263.5    |                             ^^^^ expected `ByteString`, found `Option<_>`
+#9 263.5    |
+#9 263.5    = note: expected struct `opcua::types::ByteString`
+#9 263.5                 found enum `Option<_>`
+#9 263.5 help: try wrapping the expression in `opcua::types::ByteString`
+#9 263.5    |
+#9 263.5 32 |         server_certificate: opcua::types::ByteString { value: None },
+#9 263.5    |                             +++++++++++++++++++++++++++++++++      +
+#9 263.5
+#9 263.5 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_uri`
+#9 263.5   --> src/main.rs:36:9
+#9 263.5    |
+#9 263.5 36 |         server_uri: UAString::null(),
+#9 263.5    |         ^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field
+#9 263.5    |
+#9 263.5    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
+#9 263.5
+#9 263.5 error[E0308]: mismatched types
+#9 263.5   --> src/main.rs:38:31
+#9 263.5    |
+#9 263.5 38 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
+#9 263.5    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
+#9 263.5    |
+#9 263.5    = note: expected enum `Option<Vec<_>>`
+#9 263.5             found struct `Vec<_>`
+#9 263.5    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)    
+#9 263.5
+#9 263.6 Some errors have detailed explanations: E0308, E0560.
+#9 263.6 For more information about an error, try `rustc --explain E0308`.
+#9 263.6 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
