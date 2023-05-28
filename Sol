@@ -1,19 +1,27 @@
-#8 276.6 error: expected type, found `{`
-#8 276.6   --> src/main.rs:25:23
-#8 276.6    |
-#8 276.6 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
-#8 276.6    |                     - ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#8 276.6    |                     | |
-#8 276.6    |                     | expected type
-#8 276.6    |                     | in this macro invocation
-#8 276.6    |                     | this macro call doesn't expand to a type
-#8 276.6    |                     help: try using a semicolon: `;`
-#8 276.6    |
-#8 276.6    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
-#8 276.6
-#8 276.7 error[E0425]: cannot find value `endpoint_url` in this scope
-#8 276.7   --> src/main.rs:25:9
-#8 276.7    |
-#8 276.7 25 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
-#8 276.7    |         ^^^^^^^^^^^^ expecting a type here because of type ascription
-#8 276.7
+error[E0277]: `OsString` doesn't implement `std::fmt::Display`
+#9 287.1   --> src/main.rs:25:62
+#9 287.1    |
+#9 287.1 25 |         format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
+#9 287.1    |                                                              ^^^^^^^^^^^^^^^^^^^^^^^^ `OsString` cannot be formatted with the default formatter
+#9 287.1    |
+#9 287.1    = help: the trait `std::fmt::Display` is not implemented for `OsString`
+#9 287.1    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+#9 287.1    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+#9 287.1
+#9 287.1 error[E0277]: the trait bound `opcua::types::EndpointDescription: From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not satisfied
+#9 287.1   --> src/main.rs:29:7
+#9 287.1    |
+#9 287.1 29 |     ).into();
+#9 287.1    |       ^^^^ the trait `From<(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>` is not implemented for `opcua::types::EndpointDescription`
+#9 287.1    |
+#9 287.1    = help: the following other types implement trait `From<T>`:
+#9 287.1              <opcua::types::EndpointDescription as From<&'a str>>
+#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode)>>       
+#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Option<Vec<opcua::types::UserTokenPolicy>>)>>
+#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)>>
+#9 287.1              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>>
+#9 287.1    = note: required for `(std::string::String, &str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)` to implement `Into<opcua::types::EndpointDescription>`
+#9 287.1
+#9 287.1 For more information about this error, try `rustc --explain E0277`.
+#9 287.1 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
+#9 287.1 error: could not compile `opc-ua` due to 2 previous errors; 4 warnings emitted
