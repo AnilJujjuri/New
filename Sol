@@ -10,3 +10,14 @@
 #8 273.0 For more information about this error, try `rustc --explain E0308`.
 #8 273.0 warning: `opc-ua` (bin "opc-ua") generated 1 warning
 #8 273.0 error: could not compile `opc-ua` due to previous error; 1 warning emitted
+
+
+use opcua::types::data_encoding::ByteString;
+
+let endpoint: EndpointDescription = (
+    endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname::get().unwrap()),
+    "None",
+    MessageSecurityMode::None,
+    UserTokenPolicy::anonymous(),
+    opcua::types::ByteString::null(), // Set server_certificate to null
+).into();
