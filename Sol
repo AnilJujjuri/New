@@ -1,136 +1,53 @@
-use std::sync::Arc;
-use opcua::client::prelude::*;
-use opcua::sync::*;
-use opcua::types::data_value::{DataValue};
-use opcua::types::string::*;
-use opcua::types::service_types::*;
-use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-use opcua::types::extension_object::{ExtensionObject};
-use hostname::gethostname;
-
-fn main() {
-    let mut client = ClientBuilder::new()
-        .application_name("RUST-OPCUA-Client")
-        .application_uri("urn:RustClient")
-        .create_sample_keypair(true)
-        .trust_server_certs(true)
-        .session_retry_limit(3)
-        .client().unwrap();
-    
-    println!("Client created");
-
-    // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
-    // the endpoint url, security policy, message security mode and user token policy.
-    let host=gethostname::gethostname().into_string().unwrap();
-    let endpoint: EndpointDescription = {
-        format!("opc.tcp://{}.lnties.com:53530/OPCUA/SimulationServer",host),
-        "None",
-        MessageSecurityMode::None,
-        UserTokenPolicy::anonymous().into()
-    };
-
-    // Create the session
-    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();  
- 
-    println!("Session created");
-
-    // Create a subscription and monitored items
-    if subscribe_to_values(session.clone()).is_ok() {
-        println!("Subscribed");
-        let _ = Session::run(session);
-    } else {
-        println!("Error creating subscription");
-    }
-}
-
-fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
-    let session = session.write();
-    // Create a subscription polling every 2s with a callback
-    let subscription_id = session.create_subscription(2000.0, 10, 30, 0, 0, true, DataChangeCallback::new(|changed_monitored_items| {
-        println!("Data change from server:");
-        changed_monitored_items.iter().for_each(|item| print_value(item));
-    }))?;
-    // Create some monitored items
-    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003,1008,1009,1010].iter()
-        .map(|v| NodeId::new(3, *v).into()).collect();
-    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
-
-    let status_code = session.write(&[WriteValue{
-        node_id: NodeId::new(3,1012),
-        value: DataValue::value_only(20),
-        attribute_id: 7,
-        index_range: UAString::null()
-    }]);    
-
-    match status_code {
-        Ok(_) => println!("Value written successfully"),
-        Err(status_code) => {
-            println!("Error writing to node: {:?}", status_code);
-            match status_code {
-                StatusCode::BadSessionClosed => {
-                    println!("Session was closed by the client");
-                }
-                _ => {
-                    // Handle other error codes here
-                }
-            }
-        }
-    }
-
-    println!("Created");
-    Ok(())
-}
-
-fn print_value(item: &MonitoredItem) {
-   let node_id = &item.item_to_monitor().node_id;
-   let data_value = item.last_value();
-   if let Some(ref value) = data_value.value {
-       println!("Item \"{}\", Value = {:?}", node_id, value);
-   } else {
-       println!("Item \"{}\", Value not found, error: {}", node_id, data_value.status.as_ref().unwrap());
-   }
-}
-
-
-
-#9 231.3 error: expected one of `.`, `;`, `?`, `}`, or an operator, found `,`
-#9 231.3   --> src/main.rs:26:77
-#9 231.3    |
-#9 231.3 26 |         format!("opc.tcp://{}.lnties.com:53530/OPCUA/SimulationServer",host),
-#9 231.3    |                                                                             ^ expected one of `.`, `;`, `?`, `}`, or an operator
-#9 231.3
-#9 231.4 error[E0432]: unresolved import `hostname::gethostname`
-#9 231.4  --> src/main.rs:9:5
-#9 231.4   |
-#9 231.4 9 | use hostname::gethostname;
-#9 231.4   |     ^^^^^^^^^^^^^^^^^^^^^ no `gethostname` in the root
-#9 231.4
-#9 231.4 warning: unused import: `opcua::types::string::*`
-#9 231.4  --> src/main.rs:5:5
-#9 231.4   |
-#9 231.4 5 | use opcua::types::string::*;
-#9 231.4   |     ^^^^^^^^^^^^^^^^^^^^^^^
-#9 231.4   |
-#9 231.4   = note: `#[warn(unused_imports)]` on by default
-#9 231.4
-#9 231.4 warning: unused import: `opcua::types::service_types::*`
-#9 231.4  --> src/main.rs:6:5
-#9 231.4   |
-#9 231.4 6 | use opcua::types::service_types::*;
-#9 231.4   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 231.4
-#9 231.4 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
-#9 231.4  --> src/main.rs:7:20
-#9 231.4   |
-#9 231.4 7 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-#9 231.4   |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
-#9 231.4 
-#9 231.4 warning: unused import: `ExtensionObject`
-#9 231.4  --> src/main.rs:8:38
-#9 231.4   |
-#9 231.4 8 | use opcua::types::extension_object::{ExtensionObject};
-#9 231.4   |                                      ^^^^^^^^^^^^^^^
-#9 231.4
-#9 231.5 For more information about this error, try `rustc --explain E0432`.
-#9 231.5 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
-#9 231.5 error: could not compile `opc-ua` due to 2 previous errors; 4 warnings emitted
+#9 234.9 error[E0432]: unresolved import `hostname::gethostname`
+#9 234.9   --> src/main.rs:10:5
+#9 234.9    |
+#9 234.9 10 |     hostname::gethostname;
+#9 234.9    |     ^^^^^^^^^^^^^^^^^^^^^ no `gethostname` in the root
+#9 234.9
+#9 234.9 warning: unused import: `opcua::types::string::*`
+#9 234.9  --> src/main.rs:5:5
+#9 234.9   |
+#9 234.9 5 | use opcua::types::string::*;
+#9 234.9   |     ^^^^^^^^^^^^^^^^^^^^^^^
+#9 234.9   |
+#9 234.9   = note: `#[warn(unused_imports)]` on by default
+#9 234.9
+#9 234.9 warning: unused import: `opcua::types::service_types::*`
+#9 234.9  --> src/main.rs:6:5
+#9 234.9   |
+#9 234.9 6 | use opcua::types::service_types::*;
+#9 234.9   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 234.9
+#9 234.9 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
+#9 234.9  --> src/main.rs:7:20
+#9 234.9   |
+#9 234.9 7 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
+#9 234.9   |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
+#9 234.9
+#9 234.9 warning: unused import: `ExtensionObject`
+#9 234.9  --> src/main.rs:8:38
+#9 234.9   |
+#9 234.9 8 | use opcua::types::extension_object::{ExtensionObject};
+#9 234.9   |                                      ^^^^^^^^^^^^^^^
+#9 234.9 
+#9 235.1 error[E0308]: mismatched types
+#9 235.1   --> src/main.rs:26:41
+#9 235.1    |
+#9 235.1 26 |       let endpoint: EndpointDescription = (
+#9 235.1    |  ___________________-------------------___^
+#9 235.1    | |                   |
+#9 235.1    | |                   expected due to this
+#9 235.1 27 | |         format!("opc.tcp://{}.lnties.com:53530/OPCUA/SimulationServer",host),
+#9 235.1 28 | |         "None".to_string(),
+#9 235.1 29 | |         MessageSecurityMode::None,
+#9 235.1 30 | |         UserTokenPolicy::anonymous().into()
+#9 235.1 31 | |     );
+#9 235.1    | |_____^ expected `EndpointDescription`, found `(String, String, ..., ...)`
+#9 235.1    |
+#9 235.1    = note: expected struct `opcua::types::EndpointDescription`
+#9 235.1                found tuple `(std::string::String, std::string::String, opcua::types::MessageSecurityMode, _)`
+#9 235.1
+#9 235.1 Some errors have detailed explanations: E0308, E0432.
+#9 235.1 For more information about an error, try `rustc --explain E0308`.
+#9 235.1 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
+#9 235.1 error: could not compile `opc-ua` due to 2 previous errors; 4 warnings emitted
