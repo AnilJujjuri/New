@@ -1,53 +1,53 @@
-#9 234.9 error[E0432]: unresolved import `hostname::gethostname`
-#9 234.9   --> src/main.rs:10:5
-#9 234.9    |
-#9 234.9 10 |     hostname::gethostname;
-#9 234.9    |     ^^^^^^^^^^^^^^^^^^^^^ no `gethostname` in the root
-#9 234.9
-#9 234.9 warning: unused import: `opcua::types::string::*`
-#9 234.9  --> src/main.rs:5:5
-#9 234.9   |
-#9 234.9 5 | use opcua::types::string::*;
-#9 234.9   |     ^^^^^^^^^^^^^^^^^^^^^^^
-#9 234.9   |
-#9 234.9   = note: `#[warn(unused_imports)]` on by default
-#9 234.9
-#9 234.9 warning: unused import: `opcua::types::service_types::*`
-#9 234.9  --> src/main.rs:6:5
-#9 234.9   |
-#9 234.9 6 | use opcua::types::service_types::*;
-#9 234.9   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 234.9
-#9 234.9 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
-#9 234.9  --> src/main.rs:7:20
-#9 234.9   |
-#9 234.9 7 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-#9 234.9   |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
-#9 234.9
-#9 234.9 warning: unused import: `ExtensionObject`
-#9 234.9  --> src/main.rs:8:38
-#9 234.9   |
-#9 234.9 8 | use opcua::types::extension_object::{ExtensionObject};
-#9 234.9   |                                      ^^^^^^^^^^^^^^^
-#9 234.9 
-#9 235.1 error[E0308]: mismatched types
-#9 235.1   --> src/main.rs:26:41
-#9 235.1    |
-#9 235.1 26 |       let endpoint: EndpointDescription = (
-#9 235.1    |  ___________________-------------------___^
-#9 235.1    | |                   |
-#9 235.1    | |                   expected due to this
-#9 235.1 27 | |         format!("opc.tcp://{}.lnties.com:53530/OPCUA/SimulationServer",host),
-#9 235.1 28 | |         "None".to_string(),
-#9 235.1 29 | |         MessageSecurityMode::None,
-#9 235.1 30 | |         UserTokenPolicy::anonymous().into()
-#9 235.1 31 | |     );
-#9 235.1    | |_____^ expected `EndpointDescription`, found `(String, String, ..., ...)`
-#9 235.1    |
-#9 235.1    = note: expected struct `opcua::types::EndpointDescription`
-#9 235.1                found tuple `(std::string::String, std::string::String, opcua::types::MessageSecurityMode, _)`
-#9 235.1
-#9 235.1 Some errors have detailed explanations: E0308, E0432.
-#9 235.1 For more information about an error, try `rustc --explain E0308`.
-#9 235.1 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
-#9 235.1 error: could not compile `opc-ua` due to 2 previous errors; 4 warnings emitted
+#8 237.1 error[E0432]: unresolved import `hostname::gethostname`
+#8 237.1  --> src/main.rs:9:5
+#8 237.1   |
+#8 237.1 9 | use hostname::gethostname;
+#8 237.1   |     ^^^^^^^^^^^^^^^^^^^^^ no `gethostname` in the root
+#8 237.1
+#8 237.1 warning: unused import: `opcua::types::string::*`
+#8 237.1  --> src/main.rs:5:5
+#8 237.1   |
+#8 237.1 5 | use opcua::types::string::*;
+#8 237.1   |     ^^^^^^^^^^^^^^^^^^^^^^^
+#8 237.1   |
+#8 237.1   = note: `#[warn(unused_imports)]` on by default
+#8 237.1
+#8 237.1 warning: unused import: `opcua::types::service_types::*`
+#8 237.1  --> src/main.rs:6:5
+#8 237.1   |
+#8 237.1 6 | use opcua::types::service_types::*;
+#8 237.1   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 237.1
+#8 237.1 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
+#8 237.1  --> src/main.rs:7:20
+#8 237.1   |
+#8 237.1 7 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
+#8 237.1   |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
+#8 237.1
+#8 237.1 warning: unused import: `ExtensionObject`
+#8 237.1  --> src/main.rs:8:38
+#8 237.1   |
+#8 237.1 8 | use opcua::types::extension_object::{ExtensionObject};
+#8 237.1   |                                      ^^^^^^^^^^^^^^^
+#8 237.1 
+#8 237.2 error[E0308]: mismatched types
+#8 237.2   --> src/main.rs:25:41
+#8 237.2    |
+#8 237.2 25 |       let endpoint: EndpointDescription = (
+#8 237.2    |  ___________________-------------------___^
+#8 237.2    | |                   |
+#8 237.2    | |                   expected due to this
+#8 237.2 26 | |         format!("opc.tcp://{}.lnties.com:53530/OPCUA/SimulationServer",host),
+#8 237.2 27 | |         "None".to_string(),
+#8 237.2 28 | |         MessageSecurityMode::None,
+#8 237.2 29 | |         UserTokenPolicy::anonymous().into(),
+#8 237.2 30 | |     );
+#8 237.2    | |_____^ expected `EndpointDescription`, found `(String, String, ..., ...)`
+#8 237.2    |
+#8 237.2    = note: expected struct `opcua::types::EndpointDescription`
+#8 237.2                found tuple `(std::string::String, std::string::String, opcua::types::MessageSecurityMode, _)`
+#8 237.2
+#8 237.2 Some errors have detailed explanations: E0308, E0432.
+#8 237.2 For more information about an error, try `rustc --explain E0308`.
+#8 237.2 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
+#8 237.2 error: could not compile `opc-ua` due to 2 previous errors; 4 warnings emitted
