@@ -1,44 +1,61 @@
-#8 296.3 error[E0432]: unresolved import `opcua::types::data_encoding`
-#8 296.3  --> src/main.rs:8:19
-#8 296.3   |
-#8 296.3 8 | use opcua::types::data_encoding::ByteString;
-#8 296.3   |                   ^^^^^^^^^^^^^ could not find `data_encoding` in `types`
-#8 296.3
-#8 296.3 error[E0432]: unresolved import `std::env::hostname`
-#8 296.3   --> src/main.rs:10:5
-#8 296.3    |
-#8 296.3 10 | use std::env::hostname;
-#8 296.3    |     ^^^^^^^^^^^^^^^^^^ no `hostname` in `env`
-#8 296.3
-#8 296.3 warning: unused import: `opcua::types::extension_object::ExtensionObject`
-#8 296.3  --> src/main.rs:7:5
-#8 296.3   |
-#8 296.3 7 | use opcua::types::extension_object::ExtensionObject;
-#8 296.3   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#8 296.3   |
-#8 296.3   = note: `#[warn(unused_imports)]` on by default
-#8 296.3
-#8 296.3 warning: unused imports: `MessageSecurityMode`, `UserTokenPolicy`
-#8 296.3  --> src/main.rs:9:41
-#8 296.3   |
-#8 296.3 9 | use opcua::types::{EndpointDescription, MessageSecurityMode, UserTokenPolicy};
-#8 296.3   |                                         ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^
-#8 296.3
-#8 296.5 error[E0277]: the trait bound `opcua::types::EndpointDescription: From<MyEndpoint>` is not satisfied
-#8 296.5   --> src/main.rs:33:3
-#8 296.5    |
-#8 296.5 33 | }.into();
-#8 296.5    |   ^^^^ the trait `From<MyEndpoint>` is not implemented for `opcua::types::EndpointDescription`
-#8 296.5    |
-#8 296.5    = help: the following other types implement trait `From<T>`:
-#8 296.5              <opcua::types::EndpointDescription as From<&'a str>>
-#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode)>>       
-#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Option<Vec<opcua::types::UserTokenPolicy>>)>>
-#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, Vec<opcua::types::UserTokenPolicy>)>>
-#8 296.5              <opcua::types::EndpointDescription as From<(&'a str, &'a str, opcua::types::MessageSecurityMode, opcua::types::UserTokenPolicy)>>
-#8 296.5    = note: required for `MyEndpoint` to implement `Into<opcua::types::EndpointDescription>`
-#8 296.5
-#8 296.5 Some errors have detailed explanations: E0277, E0432.
-#8 296.5 For more information about an error, try `rustc --explain E0277`.
-#8 296.5 warning: `opc-ua` (bin "opc-ua") generated 2 warnings
-#8 296.5 error: could not compile `opc-ua` due to 3 previous errors; 2 warnings emitted
+ error[E0432]: unresolved import `gethostname`
+#9 240.6  --> src/main.rs:9:5
+#9 240.6   |
+#9 240.6 9 | use gethostname::gethostname;
+#9 240.6   |     ^^^^^^^^^^^ use of undeclared crate or module `gethostname`
+#9 240.6   |
+#9 240.6 help: there is a crate or module with a similar name
+#9 240.6   |
+#9 240.6 9 | use hostname::gethostname;
+#9 240.6   |     ~~~~~~~~
+#9 240.6
+#9 240.6 warning: unused import: `opcua::types::string::*`
+#9 240.6  --> src/main.rs:5:5
+#9 240.6   |
+#9 240.6 5 | use opcua::types::string::*;
+#9 240.6   |     ^^^^^^^^^^^^^^^^^^^^^^^
+#9 240.6   |
+#9 240.6   = note: `#[warn(unused_imports)]` on by default
+#9 240.6
+#9 240.6 warning: unused import: `opcua::types::service_types::*`
+#9 240.6  --> src/main.rs:6:5
+#9 240.6   |
+#9 240.6 6 | use opcua::types::service_types::*;
+#9 240.6   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#9 240.6
+#9 240.6 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
+#9 240.6  --> src/main.rs:7:20
+#9 240.6   |
+#9 240.6 7 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
+#9 240.6   |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
+#9 240.6
+#9 240.6 warning: unused import: `ExtensionObject`
+#9 240.6  --> src/main.rs:8:38
+#9 240.6   |
+#9 240.6 8 | use opcua::types::extension_object::{ExtensionObject};
+#9 240.6   |                                      ^^^^^^^^^^^^^^^
+#9 240.6
+#9 240.8 error[E0308]: mismatched types
+#9 240.8   --> src/main.rs:25:41
+#9 240.8    |
+#9 240.8 25 |       let endpoint: EndpointDescription = (
+#9 240.8    |  ___________________-------------------___^
+#9 240.8    | |                   |
+#9 240.8    | |                   expected due to this
+#9 240.8 26 | |         format!("opc.tcp://{}.lnties.com:53530/OPCUA/SimulationServer",host),
+#9 240.8 27 | |         "None",
+#9 240.8 28 | |         MessageSecurityMode::None,
+#9 240.8 29 | |         UserTokenPolicy::anonymous().into()
+#9 240.8 30 | |     );
+#9 240.8    | |_____^ expected `EndpointDescription`, found `(String, &str, ..., ...)`
+#9 240.8    |
+#9 240.8    = note: expected struct `opcua::types::EndpointDescription`
+#9 240.8                found tuple `(std::string::String, &'static str, opcua::types::MessageSecurityMode, _)`
+#9 240.8
+#9 240.8 Some errors have detailed explanations: E0308, E0432.
+#9 240.8 For more information about an error, try `rustc --explain E0308`.
+#9 240.9 warning: `opc-ua` (bin "opc-ua") generated 4 warnings
+#9 240.9 error: could not compile `opc-ua` due to 2 previous errors; 4 warnings emitted
+------
+executor failed running [/bin/sh -c cargo build]: exit code: 101
+PS C:\Users\40020507\Downloads\opc-ua (1)\opc-ua> 
