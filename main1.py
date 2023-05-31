@@ -1,5 +1,3 @@
-
-                    
 from opcua import Client, ua
 from opcua.ua import NodeId
 
@@ -25,7 +23,6 @@ if __name__ == '__main__':
             ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
-                    SamplingInterval=2000,
                     QueueSize=1,
                     DiscardOldest=False
                 ),
@@ -37,7 +34,6 @@ if __name__ == '__main__':
             ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
-                    SamplingInterval=2000,
                     QueueSize=1,
                     DiscardOldest=False
                 ),
@@ -49,7 +45,6 @@ if __name__ == '__main__':
             ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
-                    SamplingInterval=2000,
                     QueueSize=1,
                     DiscardOldest=False
                 ),
@@ -61,7 +56,6 @@ if __name__ == '__main__':
             ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
-                    SamplingInterval=2000,
                     QueueSize=1,
                     DiscardOldest=False
                 ),
@@ -90,3 +84,13 @@ if __name__ == '__main__':
         subscription.subscribe_data_change(subscribe_to_values)
 
         # Keep the script running
+        while True:
+            pass
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+    finally:
+        client.disconnect()
+       
+
