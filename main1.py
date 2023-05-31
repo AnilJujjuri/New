@@ -22,28 +22,28 @@ if __name__ == '__main__':
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1003),
                 AttributeId=ua.AttributeIds.Value,
-                ClientHandle=1,
+                ClientHandle="1",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1008),
                 AttributeId=ua.AttributeIds.Value,
-                ClientHandle=2,
+                ClientHandle="2",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1009),
                 AttributeId=ua.AttributeIds.Value,
-                ClientHandle=3,
+                ClientHandle="3",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1010),
                 AttributeId=ua.AttributeIds.Value,
-                ClientHandle=4,
+                ClientHandle="4",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             )
