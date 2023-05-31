@@ -1,5 +1,4 @@
 from opcua import Client, ua
-from opcua.common.node import Node
 
 def subscribe_to_values(subscription, data_change_notification):
     print("Data change from server:")
@@ -20,41 +19,71 @@ if __name__ == '__main__':
 
         # Create some monitored items
         items_to_create = [
-            ua.ClientMonitoredItemCreateRequest(
-                Node=Node(3, 1003),
-                Attribute=ua.AttributeIds.Value,
-                ClientHandle="1",
-                MonitoringMode=ua.MonitoringMode.Reporting,
-                RequestedParameters=ua.MonitoringParameters()
-            ),
-            ua.ClientMonitoredItemCreateRequest(
-                Node=Node(3, 1008),
-                Attribute=ua.AttributeIds.Value,
-                ClientHandle="2",
-                MonitoringMode=ua.MonitoringMode.Reporting,
-                RequestedParameters=ua.MonitoringParameters()
-            ),
-            ua.ClientMonitoredItemCreateRequest(
-                Node=Node(3, 1009),
-                Attribute=ua.AttributeIds.Value,
-                ClientHandle="3",
-                MonitoringMode=ua.MonitoringMode.Reporting,
-                RequestedParameters=ua.MonitoringParameters()
-            ),
-            ua.ClientMonitoredItemCreateRequest(
-                Node=Node(3, 1010),
-                Attribute=ua.AttributeIds.Value,
-                ClientHandle="4",
-                MonitoringMode=ua.MonitoringMode.Reporting,
-                RequestedParameters=ua.MonitoringParameters()
+            ua.CreateMonitoredItemsRequest(
+                SubscriptionId=subscription.subscription_id,
+                TimestampsToReturn=ua.TimestampsToReturn.Neither,
+                ItemsToCreate=[
+                    ua.MonitoredItemCreateRequest(
+                        ItemToMonitor=ua.ReadValueId(
+                            NodeId=ua.NodeId(3, 1003),
+                            AttributeId=ua.AttributeIds.Value
+                        ),
+                        MonitoringMode=ua.MonitoringMode.Reporting,
+                        RequestedParameters=ua.MonitoringParameters(
+                            ClientHandle="1",
+                            SamplingInterval=0,
+                            QueueSize=1,
+                            DiscardOldest=True
+                        )
+                    ),
+                    ua.MonitoredItemCreateRequest(
+                        ItemToMonitor=ua.ReadValueId(
+                            NodeId=ua.NodeId(3, 1008),
+                            AttributeId=ua.AttributeIds.Value
+                        ),
+                        MonitoringMode=ua.MonitoringMode.Reporting,
+                        RequestedParameters=ua.MonitoringParameters(
+                            ClientHandle="2",
+                            SamplingInterval=0,
+                            QueueSize=1,
+                            DiscardOldest=True
+                        )
+                    ),
+                    ua.MonitoredItemCreateRequest(
+                        ItemToMonitor=ua.ReadValueId(
+                            NodeId=ua.NodeId(3, 1009),
+                            AttributeId=ua.AttributeIds.Value
+                        ),
+                        MonitoringMode=ua.MonitoringMode.Reporting,
+                        RequestedParameters=ua.MonitoringParameters(
+                            ClientHandle="3",
+                            SamplingInterval=0,
+                            QueueSize=1,
+                            DiscardOldest=True
+                        )
+                    ),
+                    ua.MonitoredItemCreateRequest(
+                        ItemToMonitor=ua.ReadValueId(
+                            NodeId=ua.NodeId(3, 1010),
+                            AttributeId=ua.AttributeIds.Value
+                        ),
+                        MonitoringMode=ua.MonitoringMode.Reporting,
+                        RequestedParameters=ua.MonitoringParameters(
+                            ClientHandle="4",
+                            SamplingInterval=0,
+                            QueueSize=1,
+                            DiscardOldest=True
+                        )
+                    )
+                ]
             )
         ]
 
         # Request creation of monitored items
-        result = subscription.create_monitored_items(items_to_create)
+        result = client.uaclient.service.create_monitored_items(items_to_create)
         if result:
             # Check for errors in the response
-            for response in result:
+            for response in result.Results:
                 if response.StatusCode.is_bad():
                     raise Exception(f"Failed to create monitored item: {response.StatusCode}")
 
@@ -64,16 +93,4 @@ if __name__ == '__main__':
         client.write_attribute_value(node_id, ua.AttributeIds.Value, value)
         print("Value written successfully")
 
-        # Subscribe to data change notifications
-        subscription.subscribe_data_change(subscribe_to_values)
-
-        # Keep the script running
-        while True:
-            pass
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-    finally:
-        client.disconnect()
-        print("Client disconnected")
+        # Subscribe to data change
