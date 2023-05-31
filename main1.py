@@ -1,4 +1,5 @@
 from opcua import Client, ua
+from opcua.common.node import Node
 
 def subscribe_to_values(subscription, data_change_notification):
     print("Data change from server:")
@@ -19,30 +20,30 @@ if __name__ == '__main__':
 
         # Create some monitored items
         items_to_create = [
-            ua.MonitoredItemCreateRequest(
-                NodeId=ua.NodeId(3, 1003),
-                AttributeId=ua.AttributeIds.Value,
+            ua.ClientMonitoredItemCreateRequest(
+                Node=Node(3, 1003),
+                Attribute=ua.AttributeIds.Value,
                 ClientHandle="1",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
-            ua.MonitoredItemCreateRequest(
-                NodeId=ua.NodeId(3, 1008),
-                AttributeId=ua.AttributeIds.Value,
+            ua.ClientMonitoredItemCreateRequest(
+                Node=Node(3, 1008),
+                Attribute=ua.AttributeIds.Value,
                 ClientHandle="2",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
-            ua.MonitoredItemCreateRequest(
-                NodeId=ua.NodeId(3, 1009),
-                AttributeId=ua.AttributeIds.Value,
+            ua.ClientMonitoredItemCreateRequest(
+                Node=Node(3, 1009),
+                Attribute=ua.AttributeIds.Value,
                 ClientHandle="3",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
-            ua.MonitoredItemCreateRequest(
-                NodeId=ua.NodeId(3, 1010),
-                AttributeId=ua.AttributeIds.Value,
+            ua.ClientMonitoredItemCreateRequest(
+                Node=Node(3, 1010),
+                Attribute=ua.AttributeIds.Value,
                 ClientHandle="4",
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
