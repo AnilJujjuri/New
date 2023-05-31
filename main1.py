@@ -1,8 +1,5 @@
-Client connected
-Error: MonitoringParameters.__init__() got an unexpected keyword argument 'SamplingInterval'
-ServiceFault from server received while waiting for publish response
-Client disconnected
 
+                    
 from opcua import Client, ua
 from opcua.ua import NodeId
 
@@ -30,7 +27,6 @@ if __name__ == '__main__':
                 RequestedParameters=ua.MonitoringParameters(
                     SamplingInterval=2000,
                     QueueSize=1,
-                    Filter=None,
                     DiscardOldest=False
                 ),
                 ItemToMonitor=ua.ReadValueId(
@@ -43,7 +39,6 @@ if __name__ == '__main__':
                 RequestedParameters=ua.MonitoringParameters(
                     SamplingInterval=2000,
                     QueueSize=1,
-                    Filter=None,
                     DiscardOldest=False
                 ),
                 ItemToMonitor=ua.ReadValueId(
@@ -56,7 +51,6 @@ if __name__ == '__main__':
                 RequestedParameters=ua.MonitoringParameters(
                     SamplingInterval=2000,
                     QueueSize=1,
-                    Filter=None,
                     DiscardOldest=False
                 ),
                 ItemToMonitor=ua.ReadValueId(
@@ -69,7 +63,6 @@ if __name__ == '__main__':
                 RequestedParameters=ua.MonitoringParameters(
                     SamplingInterval=2000,
                     QueueSize=1,
-                    Filter=None,
                     DiscardOldest=False
                 ),
                 ItemToMonitor=ua.ReadValueId(
@@ -96,8 +89,4 @@ if __name__ == '__main__':
         # Subscribe to data change notifications
         subscription.subscribe_data_change(subscribe_to_values)
 
-        # Keep the script running to receive data change notifications
-        while True:
-            pass
-
-    except Exception as e:
+        # Keep the script running
