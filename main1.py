@@ -22,24 +22,28 @@ if __name__ == '__main__':
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1003),
                 AttributeId=ua.AttributeIds.Value,
+                ClientHandle=1,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1008),
                 AttributeId=ua.AttributeIds.Value,
+                ClientHandle=2,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1009),
                 AttributeId=ua.AttributeIds.Value,
+                ClientHandle=3,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
                 NodeId=ua.NodeId(3, 1010),
                 AttributeId=ua.AttributeIds.Value,
+                ClientHandle=4,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             )
@@ -52,10 +56,6 @@ if __name__ == '__main__':
             for response in result:
                 if response.StatusCode.is_bad():
                     raise Exception(f"Failed to create monitored item: {response.StatusCode}")
-
-        # Assign client handles to the monitored items
-        for i in range(len(items_to_create)):
-            items_to_create[i].ClientHandle = i + 1
 
         # Write a value to a node
         node_id = ua.NodeId(3, 1012)
@@ -76,3 +76,4 @@ if __name__ == '__main__':
     finally:
         client.disconnect()
         print("Client disconnected")
+
