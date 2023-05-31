@@ -20,29 +20,25 @@ if __name__ == '__main__':
         # Create some monitored items
         items_to_create = [
             ua.MonitoredItemCreateRequest(
-                ClientHandle=1,
-                NodeId="ns=3;i=1003",
+                NodeId=ua.NodeId(3, 1003),
                 AttributeId=ua.AttributeIds.Value,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
-                ClientHandle=2,
-                NodeId="ns=3;i=1008",
+                NodeId=ua.NodeId(3, 1008),
                 AttributeId=ua.AttributeIds.Value,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
-                ClientHandle=3,
-                NodeId="ns=3;i=1009",
+                NodeId=ua.NodeId(3, 1009),
                 AttributeId=ua.AttributeIds.Value,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
             ),
             ua.MonitoredItemCreateRequest(
-                ClientHandle=4,
-                NodeId="ns=3;i=1010",
+                NodeId=ua.NodeId(3, 1010),
                 AttributeId=ua.AttributeIds.Value,
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters()
@@ -57,8 +53,12 @@ if __name__ == '__main__':
                 if response.StatusCode.is_bad():
                     raise Exception(f"Failed to create monitored item: {response.StatusCode}")
 
+        # Assign client handles to the monitored items
+        for i in range(len(items_to_create)):
+            items_to_create[i].ClientHandle = i + 1
+
         # Write a value to a node
-        node_id = "ns=3;i=1012"
+        node_id = ua.NodeId(3, 1012)
         value = ua.Variant(20, ua.VariantType.Int32)
         client.write_attribute_value(node_id, ua.AttributeIds.Value, value)
         print("Value written successfully")
