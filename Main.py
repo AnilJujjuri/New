@@ -1,91 +1,48 @@
-use std::sync::Arc;
-use opcua::client::prelude::*;
-use opcua::sync::*;
-use opcua::types::data_value::{DataValue};
-use opcua::types::string::*;
-use opcua::types::service_types::*;
-use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-use opcua::types::extension_object::{ExtensionObject};
+from opcua import Client
+from opcua.common.callback import DataChangeCallback
+from opcua.ua import ua
 
 
-fn main() {
-    let mut client = ClientBuilder::new()
-        .application_name("RUST-OPCUA-Client")
-        .application_uri("urn:RustClient")
-        .create_sample_keypair(true)
-        .trust_server_certs(true)
-        .session_retry_limit(3)
-        .client().unwrap();
-    println!("Client created");
+def subscribe_to_values(changed_monitored_items):
+    print("Data change from server:")
+    for item in changed_monitored_items:
+        node_id = item.NodeId
+        data_value = item.Value.Value
+        print(f"Item {node_id}, Value = {data_value}")
 
-    // Create an endpoint. The EndpointDescription can be made from a tuple consisting of
-    // the endpoint url, security policy, message security mode and user token policy.
-    let endpoint: EndpointDescription = (
-        "opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer",
-        "None",
-        MessageSecurityMode::None,
-        UserTokenPolicy::anonymous()
-    ).into();
 
-    // Create the session
-    let session = client.connect_to_endpoint(endpoint, IdentityToken::Anonymous).unwrap();  
- 
-    println!("Session created");
+if __name__ == '__main__':
+    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
+    try:
+        client.connect()
+        print("Client connected")
 
-    // Create a subscription and monitored items
-    if subscribe_to_values(session.clone()).is_ok() {
-        println!("Subscribed");
-        let _ = Session::run(session);
-    } else {
-        println!("Error creating subscription");
-    }
-}
+        # Create a subscription
+        subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
 
-fn subscribe_to_values(session: Arc<RwLock<Session>>) -> Result<(), StatusCode> {
-    let session = session.write();
-    // Create a subscription polling every 2s with a callback
-    let subscription_id = session.create_subscription(2000.0, 10, 30, 0, 0, true, DataChangeCallback::new(|changed_monitored_items| {
-        println!("Data change from server:");
-        changed_monitored_items.iter().for_each(|item| print_value(item));
-    }))?;
-    // Create some monitored items
-    let items_to_create: Vec<MonitoredItemCreateRequest> = [1003,1008,1009,1010].iter()
-        .map(|v| NodeId::new(3, *v).into()).collect();
-    let _ = session.create_monitored_items(subscription_id, TimestampsToReturn::Both, &items_to_create)?;
+        # Create some monitored items
+        items_to_create = [ua.ReadValueId(NodeId(3, 1003), ua.AttributeIds.Value, None, None),
+                           ua.ReadValueId(NodeId(3, 1008), ua.AttributeIds.Value, None, None),
+                           ua.ReadValueId(NodeId(3, 1009), ua.AttributeIds.Value, None, None),
+                           ua.ReadValueId(NodeId(3, 1010), ua.AttributeIds.Value, None, None)]
+        client.create_monitored_items(subscription, items_to_create)
 
-    let status_code = session.write(&[WriteValue{
-        node_id: NodeId::new(3,1012),
-        value: DataValue::value_only(20),
-        attribute_id: 7,
-        index_range: UAString::null()
-    }]);
+        # Write a value to a node
+        node_id = ua.NodeId(3, 1012)
+        value = ua.Variant(20, ua.VariantType.Int32)
+        client.write_attribute_value(node_id, ua.AttributeIds.Value, value)
+        print("Value written successfully")
 
-    match status_code {
-        Ok(_) => println!("Value written successfully"),
-        Err(status_code) => {
-            println!("Error writing to node: {:?}", status_code);
-            match status_code {
-                StatusCode::BadSessionClosed => {
-                    println!("Session was closed by the client");
-                }
-                _ => {
-                    // Handle other error codes here
-                }
-            }
-        }
-    }
+        # Subscribe to data change notifications
+        subscription.subscribe_data_change(DataChangeCallback(subscribe_to_values))
 
-    println!("Created");
-    Ok(())
-}
+        # Keep the script running to receive data change notifications
+        while True:
+            pass
 
-fn print_value(item: &MonitoredItem) {
-   let node_id = &item.item_to_monitor().node_id;
-   let data_value = item.last_value();
-   if let Some(ref value) = data_value.value {
-       println!("Item \"{}\", Value = {:?}", node_id, value);
-   } else {
-       println!("Item \"{}\", Value not found, error: {}", node_id, data_value.status.as_ref().unwrap());
-   }
-}
+    except Exception as e:
+        print(f"Error: {e}")
 
+    finally:
+        client.disconnect()
+        print("Client disconnected")
