@@ -1,3 +1,4 @@
+
 from opcua import Client, ua
 from opcua.ua import NodeId
 
@@ -20,7 +21,7 @@ if __name__ == '__main__':
 
         # Create some monitored items
         items_to_create = [
-            ua.ClientMonitoredItemCreateRequest(
+            ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
                     ClientHandle=1,
@@ -33,7 +34,7 @@ if __name__ == '__main__':
                     AttributeId=ua.AttributeIds.Value
                 )
             ),
-            ua.ClientMonitoredItemCreateRequest(
+            ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
                     ClientHandle=2,
@@ -46,7 +47,7 @@ if __name__ == '__main__':
                     AttributeId=ua.AttributeIds.Value
                 )
             ),
-            ua.ClientMonitoredItemCreateRequest(
+            ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
                     ClientHandle=3,
@@ -59,7 +60,7 @@ if __name__ == '__main__':
                     AttributeId=ua.AttributeIds.Value
                 )
             ),
-            ua.ClientMonitoredItemCreateRequest(
+            ua.MonitoredItemCreateRequest(
                 MonitoringMode=ua.MonitoringMode.Reporting,
                 RequestedParameters=ua.MonitoringParameters(
                     ClientHandle=4,
@@ -96,7 +97,8 @@ if __name__ == '__main__':
             pass
 
     except Exception as e:
-        print(f"Error
+        print(f"
+
 
                     
                 
