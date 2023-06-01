@@ -32,3 +32,14 @@ if __name__ == "__main__":
   File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\client.py", line 188, in set_security_string
     raise ua.UaError('Wrong format: `{0}`, expected at least 4 comma-separated values'.format(string))
 opcua.ua.uaerrors._base.UaError: Wrong format: `None`, expected at least 4 comma-separated values
+        
+        
+        Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 14, in <module>
+    client.set_security_string("Basic256,None,None,None")
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\client.py", line 190, in set_security_string
+    mode = getattr(ua.MessageSecurityMode, parts[1])
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\enum.py", line 437, in __getattr__
+    raise AttributeError(name) from None
+AttributeError: None. Did you mean: 'None_'?
+
