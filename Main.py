@@ -87,3 +87,12 @@ if __name__ == "__main__":
   File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 6, in subscribe_to_values
     subscription = ua.Subscription(session,100, ua.SubscriptionDiagnosticsDataType())
 AttributeError: module 'opcua.ua' has no attribute 'Subscription'. Did you mean: 'EnumDescription'?
+        
+        
+        
+        Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 20, in <module>
+    subscription, handle = subscribe_to_values(session)
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 6, in subscribe_to_values
+    subscription = session.create_subscription(session,100, opcua.subscription.SubscriptionDiagnosticsDataType())
+AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
