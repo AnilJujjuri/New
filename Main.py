@@ -53,3 +53,30 @@ Traceback (most recent call last):
     subscription = session.create_subscription(100, ua.SubscriptionDiagnosticsDataType())
 AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
 
+import opcua
+from opcua import ua
+
+def subscribe_to_values(session):
+    # Create a subscription
+    subscription = session.create_subscription(100, ua.SubscriptionDiagnosticsDataType())
+    # Create a monitored item
+    node = session.get_node("ns=2;s=Temperature")
+    handle = subscription.subscribe_data_change(node)
+    return subscription, handle
+
+if __name__ == "__main__":
+    client = opcua.Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
+    client.set_security_string("Basic256,None_,None,None")
+    client.connect()
+    print("Client created")
+    session = client.create_session()
+    print("Session created")
+    subscription, handle = subscribe_to_values(session)
+    print("Subscribed")
+    try:
+        while True:
+            pass
+    finally:
+        subscription.unsubscribe(handle)
+        session.close()
+        client.disconnect()
