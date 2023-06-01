@@ -1,3 +1,4 @@
+
 from opcua import Client
 from opcua.ua import NodeId, MonitoredItemCreateRequest
 
@@ -21,22 +22,10 @@ if __name__ == '__main__':
 
         # Create some monitored items
         items_to_create = [
-            MonitoredItemCreateRequest(
-                NodeId=NodeId(3, 1003),
-                RequestedParameters=None
-            ),
-            MonitoredItemCreateRequest(
-                NodeId=NodeId(3, 1008),
-                RequestedParameters=None
-            ),
-            MonitoredItemCreateRequest(
-                NodeId=NodeId(3, 1009),
-                RequestedParameters=None
-            ),
-            MonitoredItemCreateRequest(
-                NodeId=NodeId(3, 1010),
-                RequestedParameters=None
-            )
+            MonitoredItemCreateRequest(Node=None, RequestedParameters=None),
+            MonitoredItemCreateRequest(Node=None, RequestedParameters=None),
+            MonitoredItemCreateRequest(Node=None, RequestedParameters=None),
+            MonitoredItemCreateRequest(Node=None, RequestedParameters=None)
         ]
         monitored_items = subscription.create_monitored_items(items_to_create)
 
