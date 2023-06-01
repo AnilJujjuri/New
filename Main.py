@@ -1,14 +1,12 @@
 from opcua import Client
-from opcua.common.callback import DataChangeCallback
-from opcua.ua import ua
 
 
-def subscribe_to_values(changed_monitored_items):
+def subscribe_to_values(subscription, data):
     print("Data change from server:")
-    for item in changed_monitored_items:
+    for item in data.MonitoredItems:
         node_id = item.NodeId
-        data_value = item.Value.Value
-        print(f"Item {node_id}, Value = {data_value}")
+        value = item.Value.Value
+        print(f"Item {node_id}, Value = {value}")
 
 
 if __name__ == '__main__':
@@ -18,23 +16,24 @@ if __name__ == '__main__':
         print("Client connected")
 
         # Create a subscription
-        subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+        subscription = client.create_subscription(2000, None)
 
         # Create some monitored items
-        items_to_create = [ua.ReadValueId(NodeId(3, 1003), ua.AttributeIds.Value, None, None),
-                           ua.ReadValueId(NodeId(3, 1008), ua.AttributeIds.Value, None, None),
-                           ua.ReadValueId(NodeId(3, 1009), ua.AttributeIds.Value, None, None),
-                           ua.ReadValueId(NodeId(3, 1010), ua.AttributeIds.Value, None, None)]
-        client.create_monitored_items(subscription, items_to_create)
+        items_to_create = [
+            (1003, None),
+            (1008, None),
+            (1009, None),
+            (1010, None)
+        ]
+        monitored_items = subscription.create_monitored_items(200, items_to_create)
 
         # Write a value to a node
-        node_id = ua.NodeId(3, 1012)
-        value = ua.Variant(20, ua.VariantType.Int32)
-        client.write_attribute_value(node_id, ua.AttributeIds.Value, value)
-        print("Value written successfully")
+        node_id = 1012
+        value = 20
+        client.write_value(node_id, value)
 
         # Subscribe to data change notifications
-        subscription.subscribe_data_change(DataChangeCallback(subscribe_to_values))
+        subscription.data_change_notification.subscribe(lambda _, data: subscribe_to_values(subscription, data))
 
         # Keep the script running to receive data change notifications
         while True:
