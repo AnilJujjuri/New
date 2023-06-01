@@ -45,3 +45,6 @@ if __name__ == '__main__':
     finally:
         client.disconnect()
         print("Client disconnected")
+Client connected
+Error: Subscription.create_monitored_items() takes 2 positional arguments but 3 were given
+ServiceFault from server received while waiting for publish response
