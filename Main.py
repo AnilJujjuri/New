@@ -1,7 +1,8 @@
+
 from opcua import Client
 
 
-def subscribe_to_values(subscription, data):
+def data_change_handler(subscription, data):
     print("Data change from server:")
     for item in data.MonitoredItems:
         node_id = item.NodeId
@@ -15,8 +16,8 @@ if __name__ == '__main__':
         client.connect()
         print("Client connected")
 
-        # Create a subscription
-        subscription = client.create_subscription(2000)
+        # Create a subscription with a data change handler
+        subscription = client.create_subscription(2000, data_change_handler)
 
         # Create some monitored items
         items_to_create = [
@@ -31,9 +32,6 @@ if __name__ == '__main__':
         node_id = 1012
         value = 20
         client.write_value(node_id, value)
-
-        # Subscribe to data change notifications
-        subscription.data_change_notification.subscribe(lambda _, data: subscribe_to_values(subscription, data))
 
         # Keep the script running to receive data change notifications
         while True:
