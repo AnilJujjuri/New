@@ -42,4 +42,14 @@ opcua.ua.uaerrors._base.UaError: Wrong format: `None`, expected at least 4 comma
   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\enum.py", line 437, in __getattr__
     raise AttributeError(name) from None
 AttributeError: None. Did you mean: 'None_'?
+        
+        
+        Client created
+Session created
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 19, in <module>
+    subscription, handle = subscribe_to_values(session)
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 6, in subscribe_to_values
+    subscription = session.create_subscription(100, ua.SubscriptionDiagnosticsDataType())
+AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
 
