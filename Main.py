@@ -80,3 +80,10 @@ if __name__ == "__main__":
         subscription.unsubscribe(handle)
         session.close()
         client.disconnect()
+
+        Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 20, in <module>
+    subscription, handle = subscribe_to_values(session)
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 6, in subscribe_to_values
+    subscription = ua.Subscription(session,100, ua.SubscriptionDiagnosticsDataType())
+AttributeError: module 'opcua.ua' has no attribute 'Subscription'. Did you mean: 'EnumDescription'?
