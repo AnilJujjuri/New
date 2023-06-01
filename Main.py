@@ -1,39 +1,72 @@
+from opcua import Client, ua
 
-from opcua import Client
-
-
-def data_change_handler(subscription, data):
+def subscribe_to_values(subscription, data_change_notification):
     print("Data change from server:")
-    for item in data.MonitoredItems:
-        node_id = item.NodeId
-        value = item.Value.Value
-        print(f"Item {node_id}, Value = {value}")
-
+    for item in data_change_notification.MonitoredItems:
+        node_id = item.ClientHandle
+        data_value = item.Value.Value
+        print(f"Item {node_id}, Value = {data_value}")
 
 if __name__ == '__main__':
-    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
     try:
+        # Create a client and connect to the OPC UA server
+        client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
         client.connect()
         print("Client connected")
 
-        # Create a subscription with a data change handler
-        subscription = client.create_subscription(2000, data_change_handler)
+        # Create a subscription
+        subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
 
         # Create some monitored items
         items_to_create = [
-            (1003, None),
-            (1008, None),
-            (1009, None),
-            (1010, None)
+            ua.MonitoredItemCreateRequest(
+                NodeId=ua.NodeId(3, 1003),
+                AttributeId=ua.AttributeIds.Value,
+                MonitoringMode=ua.MonitoringMode.Reporting,
+                RequestedParameters=ua.MonitoringParameters()
+            ),
+            ua.MonitoredItemCreateRequest(
+                NodeId=ua.NodeId(3, 1008),
+                AttributeId=ua.AttributeIds.Value,
+                MonitoringMode=ua.MonitoringMode.Reporting,
+                RequestedParameters=ua.MonitoringParameters()
+            ),
+            ua.MonitoredItemCreateRequest(
+                NodeId=ua.NodeId(3, 1009),
+                AttributeId=ua.AttributeIds.Value,
+                MonitoringMode=ua.MonitoringMode.Reporting,
+                RequestedParameters=ua.MonitoringParameters()
+            ),
+            ua.MonitoredItemCreateRequest(
+                NodeId=ua.NodeId(3, 1010),
+                AttributeId=ua.AttributeIds.Value,
+                MonitoringMode=ua.MonitoringMode.Reporting,
+                RequestedParameters=ua.MonitoringParameters()
+            )
         ]
-        monitored_items = subscription.create_monitored_items(items_to_create)
+
+        # Request creation of monitored items
+        result = subscription.create_monitored_items(items_to_create)
+        if result:
+            # Check for errors in the response
+            for response in result:
+                if response.StatusCode.is_bad():
+                    raise Exception(f"Failed to create monitored item: {response.StatusCode}")
+
+        # Assign client handles to the monitored items
+        for i in range(len(items_to_create)):
+            items_to_create[i].ClientHandle = i + 1
 
         # Write a value to a node
-        node_id = 1012
-        value = 20
-        client.write_value(node_id, value)
+        node_id = ua.NodeId(3, 1012)
+        value = ua.Variant(20, ua.VariantType.Int32)
+        client.write_attribute_value(node_id, ua.AttributeIds.Value, value)
+        print("Value written successfully")
 
-        # Keep the script running to receive data change notifications
+        # Subscribe to data change notifications
+        subscription.subscribe_data_change(subscribe_to_values)
+
+        # Keep the script running
         while True:
             pass
 
@@ -43,3 +76,4 @@ if __name__ == '__main__':
     finally:
         client.disconnect()
         print("Client disconnected")
+
