@@ -16,7 +16,7 @@ if __name__ == '__main__':
         print("Client connected")
 
         # Create a subscription
-        subscription = client.create_subscription(2000, None)
+        subscription = client.create_subscription(2000)
 
         # Create some monitored items
         items_to_create = [
@@ -25,7 +25,7 @@ if __name__ == '__main__':
             (1009, None),
             (1010, None)
         ]
-        monitored_items = subscription.create_monitored_items(200, items_to_create)
+        monitored_items = subscription.create_monitored_items(items_to_create)
 
         # Write a value to a node
         node_id = 1012
@@ -45,6 +45,3 @@ if __name__ == '__main__':
     finally:
         client.disconnect()
         print("Client disconnected")
-Client connected
-Error: Subscription.create_monitored_items() takes 2 positional arguments but 3 were given
-ServiceFault from server received while waiting for publish response
