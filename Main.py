@@ -1,5 +1,5 @@
 from opcua import Client
-from opcua.ua import MonitoredItemCreateRequest
+from opcua.ua import NodeId, MonitoredItemCreateRequest
 
 
 def data_change_handler(subscription, data):
