@@ -1,3 +1,9 @@
+ Value = Double(1.285033)
+2023-05-31 11:40:09 Data change from server:
+2023-05-31 11:40:09 Item "ns=3;i=1003", Value = Double(0.2702553)
+2023-05-31 11:40:11 Data change from server:
+2023-05-31 11:40:11 Item "ns=3;i=1003", Value = Double(-0.492261)
+2023-05-31 11:40:13 Data change from server:
 from opcua import Client
 
 # OPC UA server endpoint URL
@@ -12,38 +18,28 @@ print("Client created and connected")
 session = client.create_session()
 print("Session created")
 
+# Get the root node of the server
+root_node = session.get_root_node()
+
 # Define the namespace and identifier of the node to update
 namespace_index = 3
 identifier = 1003
 
+# Get the node object using the namespace index and identifier
+node = root_node.get_child([
+    ("ns{}=urn:NodeServer:default_instance/".format(namespace_index), "Object"),
+    ("ns{}=urn:NodeServer:default_instance/".format(namespace_index), "MyVariable"),
+    ("ns{}=urn:NodeServer:default_instance/".format(namespace_index), "Value"),
+])
+
 # Update values in a loop (example)
 values = [-1.398222, 1.862195, 1.19141, -1.677371, 1.284918]
 for value in values:
-    # Construct the node ID
-    node_id = f"ns={namespace_index};i={identifier}"
-
     # Write the value to the server
-    session.write_value(node_id, value)
+    node.set_value(value)
     print(f"Value {value} written successfully")
 
 # Close the session and disconnect from the server
 session.close()
 client.disconnect()
 print("Session closed and client disconnected")
-server:
-2023-05-31 11:39:57 Item "ns=3;i=1003", Value = Double(-1.002516)
-2023-05-31 11:39:59 Data change from server:
-2023-05-31 11:39:59 Item "ns=3;i=1003", Value = Double(-1.673301)
-2023-05-31 11:40:01 Data change from server:
-2023-05-31 11:40:01 Item "ns=3;i=1003", Value = Double(1.587115)
-2023-05-31 11:40:03 Data change from server:
-2023-05-31 11:40:03 Item "ns=3;i=1003", Value = Double(0.9163301)
-2023-05-31 11:40:05 Data change from server:
-2023-05-31 11:40:05 Item "ns=3;i=1003", Value = Double(-1.952451)
-2023-05-31 11:40:07 Data change from server:
-2023-05-31 11:40:07 Item "ns=3;i=1003", Value = Double(1.285033)
-2023-05-31 11:40:09 Data change from server:
-2023-05-31 11:40:09 Item "ns=3;i=1003", Value = Double(0.2702553)
-2023-05-31 11:40:11 Data change from server:
-2023-05-31 11:40:11 Item "ns=3;i=1003", Value = Double(-0.492261)
-2023-05-31 11:40:13 Data change from server:
