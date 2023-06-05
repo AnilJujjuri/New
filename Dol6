@@ -1,45 +1,53 @@
- Value = Double(1.285033)
-2023-05-31 11:40:09 Data change from server:
-2023-05-31 11:40:09 Item "ns=3;i=1003", Value = Double(0.2702553)
-2023-05-31 11:40:11 Data change from server:
-2023-05-31 11:40:11 Item "ns=3;i=1003", Value = Double(-0.492261)
-2023-05-31 11:40:13 Data change from server:
-from opcua import Client
-
-# OPC UA server endpoint URL
-url = "opc.tcp://localhost:4840"
-
-# Create a client and connect to the server
-client = Client(url)
-client.connect()
-print("Client created and connected")
-
-# Create a session
-session = client.create_session()
-print("Session created")
-
-# Get the root node of the server
-root_node = session.get_root_node()
-
-# Define the namespace and identifier of the node to update
-namespace_index = 3
-identifier = 1003
-
-# Get the node object using the namespace index and identifier
-node = root_node.get_child([
-    ("ns{}=urn:NodeServer:default_instance/".format(namespace_index), "Object"),
-    ("ns{}=urn:NodeServer:default_instance/".format(namespace_index), "MyVariable"),
-    ("ns{}=urn:NodeServer:default_instance/".format(namespace_index), "Value"),
-])
-
-# Update values in a loop (example)
-values = [-1.398222, 1.862195, 1.19141, -1.677371, 1.284918]
-for value in values:
-    # Write the value to the server
-    node.set_value(value)
-    print(f"Value {value} written successfully")
-
-# Close the session and disconnect from the server
-session.close()
-client.disconnect()
-print("Session closed and client disconnected")
+Client created and connected
+Session created
+root node obtained: i=84
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\opc\main.py", line 23, in <module>
+    node = root_node.get_child([
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\node.py", line 471, in get_child
+    result = self.server.translate_browsepaths_to_nodeids([bpath])
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 427, in translate_browsepaths_to_nodeids
+    data = self._uasocket.send_request(request)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 81, in send_request
+    future = self._send_request(request, callback, timeout, message_type)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 55, in _send_request
+    binreq = struct_to_binary(request)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
+    packet.append(to_binary(uatype, val))
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
+    return struct_to_binary(val)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 256, in struct_to_binary
+    packet.append(list_to_binary(uatype[6:], val))
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in list_to_binary
+    pack = [to_binary(uatype, el) for el in val]
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in <listcomp>
+    pack = [to_binary(uatype, el) for el in val]
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
+    return struct_to_binary(val)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
+    packet.append(to_binary(uatype, val))
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
+    return struct_to_binary(val)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 256, in struct_to_binary
+    packet.append(list_to_binary(uatype[6:], val))
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in list_to_binary
+    pack = [to_binary(uatype, el) for el in val]
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in <listcomp>
+    pack = [to_binary(uatype, el) for el in val]
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
+    return struct_to_binary(val)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
+    packet.append(to_binary(uatype, val))
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 274, in to_binary
+    return pack_uatype(vtype, val)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 194, in pack_uatype
+    return struct_to_binary(value)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
+    packet.append(to_binary(uatype, val))
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 274, in to_binary
+    return pack_uatype(vtype, val)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 184, in pack_uatype
+    return getattr(Primitives, vtype.name).pack(value)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 69, in pack
+    string = string.encode('utf-8')
+AttributeError: 'tuple' object has no attribute 'encode'
