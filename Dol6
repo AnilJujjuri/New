@@ -1,145 +1,79 @@
- error: expected `;`, found keyword `let`
-#9 303.0    --> src/main.rs:189:40
-#9 303.0     |
-#9 303.0 189 |     let node_id = &item.item_to_monitor
-#9 303.0     |                                        ^ help: add `;` here
-#9 303.0 190 |    let data_value = item.last_value();
-#9 303.0     |    --- unexpected token
-#9 303.0
-#9 303.1 error[E0432]: unresolved import `hostname::get_hostname`
-#9 303.1   --> src/main.rs:19:5
-#9 303.1    |
-#9 303.1 19 | use hostname::get_hostname;
-#9 303.1    |     ^^^^^^^^^^^^^^^^^^^^^^ no `get_hostname` in the root
-#9 303.1
-#9 303.1 error[E0603]: module `prelude` is private
-#9 303.1   --> src/main.rs:17:12
-#9 303.1    |
-#9 303.1 17 | use opcua::prelude::ByteString;
-#9 303.1    |            ^^^^^^^ private module
-#9 303.1    |
-#9 303.1 note: the module `prelude` is defined here
-#9 303.1   --> /usr/local/cargo/registry/src/github.com-1ecc6299db9ec823/opcua-0.11.0/src/lib.rs:78:1
-#9 303.1    |
-#9 303.1 78 | mod prelude {
-#9 303.1    | ^^^^^^^^^^^
-#9 303.1
-#9 303.1 warning: unused import: `opcua::types::service_types::*`
-#9 303.1   --> src/main.rs:11:5
-#9 303.1    |
-#9 303.1 11 | use opcua::types::service_types::*;
-#9 303.1    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#9 303.1    |
-#9 303.1    = note: `#[warn(unused_imports)]` on by default
-#9 303.1
-#9 303.1 warning: unused imports: `ExpandedNodeId`, `ObjectId`, `ObjectTypeId`
-#9 303.1   --> src/main.rs:13:20
-#9 303.1    |
-#9 303.1 13 | use opcua::types::{ExpandedNodeId, NodeId, ObjectId, ObjectTypeId};
-#9 303.1    |                    ^^^^^^^^^^^^^^          ^^^^^^^^  ^^^^^^^^^^^^
-#9 303.1
-#9 303.2 error[E0599]: no method named `build` found for struct `opcua::client::prelude::ClientBuilder` in the current scope   
-#9 303.2   --> src/main.rs:37:10
-#9 303.2    |
-#9 303.2 25 |       let mut client = ClientBuilder::new()
-#9 303.2    |  ______________________-
-#9 303.2 26 | |
-#9 303.2 27 | |         .application_name("RUST-OPCUA-Client")
-#9 303.2 28 | |
-#9 303.2 ...  |
-#9 303.2 36 | |
-#9 303.2 37 | |         .build()
-#9 303.2    | |         -^^^^^ method not found in `ClientBuilder`
-#9 303.2    | |_________|
-#9 303.2    |
-#9 303.2
-#9 303.3 error[E0308]: mismatched types
-#9 303.3   --> src/main.rs:49:23
-#9 303.3    |
-#9 303.3 49 |         endpoint_url: format!("opc.tcp://{}:53530/OPCUA/SimulationServer", hostname),
-#9 303.3    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
-#9 303.3    |
-#9 303.3    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info) 
-#9 303.3
-#9 303.3 error[E0308]: mismatched types
-#9 303.3   --> src/main.rs:51:30
-#9 303.3    |
-#9 303.3 51 |         security_policy_uri: "None".to_string(),
-#9 303.3    |                              ^^^^^^^^^^^^^^^^^^ expected `UAString`, found `String`
-#9 303.3    |
-#9 303.3 help: call `Into::into` on this expression to convert `std::string::String` into `UAString`
-#9 303.3    |
-#9 303.3 51 |         security_policy_uri: "None".to_string().into(),
-#9 303.3    |                                                +++++++
-#9 303.3
-#9 303.3 error[E0560]: struct `opcua::types::EndpointDescription` has no field named `server_application_uri`
-#9 303.3   --> src/main.rs:57:9
-#9 303.3    |
-#9 303.3 57 |         server_application_uri: UAString::null(),
-#9 303.3    |         ^^^^^^^^^^^^^^^^^^^^^^ `opcua::types::EndpointDescription` does not have this field
-#9 303.3    |
-#9 303.3    = note: available fields are: `endpoint_url`, `server`, `server_certificate`, `security_mode`, `security_policy_uri` ... and 3 others
-#9 303.3
-#9 303.3 error[E0308]: mismatched types
-#9 303.3   --> src/main.rs:59:31
-#9 303.3    |
-#9 303.3 59 |         user_identity_tokens: vec![UserTokenPolicy::anonymous()],
-#9 303.3    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<UserTokenPolicy>>`, found `Vec<UserTokenPolicy>`
-#9 303.3    |
-#9 303.3    = note: expected enum `Option<Vec<_>>`
-#9 303.3             found struct `Vec<_>`
-#9 303.3    = note: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)    
-#9 303.3
-#9 303.3 error[E0599]: no method named `unwrap` found for struct `lock_api::rwlock::RwLockWriteGuard<'_, parking_lot::raw_rwlock::RawRwLock, opcua::client::prelude::Session>` in the current scope
-#9 303.3   --> src/main.rs:91:35
-#9 303.3    |
-#9 303.3 91 |     let session = session.write().unwrap();
-#9 303.3    |                                   ^^^^^^ method not found in `RwLockWriteGuard<'_, RawRwLock, Session>`
-#9 303.3
-#9 303.3 error[E0308]: mismatched types
-#9 303.3    --> src/main.rs:131:31
-#9 303.3     |
-#9 303.3 131 |                 attribute_id: AttributeId::Value,
-#9 303.3     |                               ^^^^^^^^^^^^^^^^^^ expected `u32`, found `AttributeId`
-#9 303.3
-#9 303.3 error[E0433]: failed to resolve: use of undeclared type `Value`
-#9 303.3    --> src/main.rs:164:38
-#9 303.3     |
-#9 303.3 164 |         value: DataValue::value_only(Value::UInt32(20)),
-#9 303.3     |                                      ^^^^^ use of undeclared type `Value`
-#9 303.3     |
-#9 303.3 help: there is an enum variant `crate::AttributeId::Value` and 4 others; try using the variant's enum
-#9 303.3     |
-#9 303.3 164 |         value: DataValue::value_only(crate::AttributeId(20)),
-#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~
-#9 303.3 164 |         value: DataValue::value_only(crate::NodeAttributesMask(20)),
-#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~
-#9 303.3 164 |         value: DataValue::value_only(opcua::types::AttributeId(20)),
-#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~
-#9 303.3 164 |         value: DataValue::value_only(opcua::types::NodeAttributesMask(20)),
-#9 303.3     |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#9 303.3
-#9 303.4 error[E0616]: field `item_to_monitor` of struct `opcua::client::prelude::MonitoredItem` is private
-#9 303.4    --> src/main.rs:189:25
-#9 303.4     |
-#9 303.4 189 |     let node_id = &item.item_to_monitor
-#9 303.4     |                         ^^^^^^^^^^^^^^^ private field
-#9 303.4     |
-#9 303.4 help: a method `item_to_monitor` also exists, call it with parentheses
-#9 303.4     |
-#9 303.4 189 |     let node_id = &item.item_to_monitor()
-#9 303.4     |                                        ++
-#9 303.4
-#9 303.4 error[E0308]: mismatched types
-#9 303.4   --> src/main.rs:63:25
-#9 303.4    |
-#9 303.4 63 |         security_level: None,
-#9 303.4    |                         ^^^^ expected `u8`, found `Option<_>`
-#9 303.4    |
-#9 303.4    = note: expected type `u8`
-#9 303.4               found enum `Option<_>`
-#9 303.4
-#9 303.4 Some errors have detailed explanations: E0308, E0432, E0433, E0560, E0599, E0603, E0616.
-#9 303.4 For more information about an error, try `rustc --explain E0308`.
-#9 303.4 warning: `opc-ua` (bin "opc-ua") generated 2 warnings
-#9 303.4 error: could not compile `opc-ua` due to 13 previous errors; 2 warnings emitted
+2023-05-31 11:39:16 Client created
+2023-05-31 11:39:16 Session created
+2023-05-31 11:39:17 Value written successfully
+2023-05-31 11:39:17 Created
+2023-05-31 11:39:17 Subscribed
+2023-05-31 11:39:18 Data change from server:
+2023-05-31 11:39:18 Item "ns=3;i=1003", Value = Double(-1.398222)
+2023-05-31 11:39:20 Data change from server:
+2023-05-31 11:39:20 Item "ns=3;i=1003", Value = Double(1.862195)
+2023-05-31 11:39:22 Data change from server:
+2023-05-31 11:39:22 Item "ns=3;i=1003", Value = Double(1.19141)
+2023-05-31 11:39:24 Data change from server:
+2023-05-31 11:39:24 Item "ns=3;i=1003", Value = Double(-1.677371)
+2023-05-31 11:39:26 Data change from server:
+2023-05-31 11:39:26 Item "ns=3;i=1003", Value = Double(1.284918)
+2023-05-31 11:39:28 Data change from server:
+2023-05-31 11:39:28 Item "ns=3;i=1003", Value = Double(0.545335)
+2023-05-31 11:39:30 Data change from server:
+2023-05-31 11:39:30 Item "ns=3;i=1003", Value = Double(-0.2171814)
+2023-05-31 11:39:32 Data change from server:
+2023-05-31 11:39:32 Item "ns=3;i=1003", Value = Double(-1.96065)
+2023-05-31 11:39:34 Data change from server:
+2023-05-31 11:39:34 Item "ns=3;i=1003", Value = Double(1.276834)
+2023-05-31 11:39:37 Data change from server:
+2023-05-31 11:39:37 Item "ns=3;i=1003", Value = Double(0.9873071)
+2023-05-31 11:39:39 Data change from server:
+2023-05-31 11:39:39 Item "ns=3;i=1003", Value = Double(0.2247908)
+2023-05-31 11:39:41 Data change from server:
+2023-05-31 11:39:41 Item "ns=3;i=1003", Value = Double(1.35601)
+2023-05-31 11:39:43 Data change from server:
+2023-05-31 11:39:43 Item "ns=3;i=1003", Value = Double(0.6852245)
+2023-05-31 11:39:45 Data change from server:
+2023-05-31 11:39:45 Item "ns=3;i=1003", Value = Double(-0.05435893)
+2023-05-31 11:39:47 Data change from server:
+2023-05-31 11:39:47 Item "ns=3;i=1003", Value = Double(-1.092069)
+2023-05-31 11:39:49 Data change from server:
+2023-05-31 11:39:49 Item "ns=3;i=1003", Value = Double(0.03914976)
+2023-05-31 11:39:51 Data change from server:
+2023-05-31 11:39:51 Item "ns=3;i=1003", Value = Double(-0.7233666)
+2023-05-31 11:39:53 Data change from server:
+2023-05-31 11:39:53 Item "ns=3;i=1003", Value = Double(-1.371219)
+2023-05-31 11:39:55 Data change from server:
+2023-05-31 11:39:55 Item "ns=3;i=1003", Value = Double(1.866265)
+2023-05-31 11:39:57 Data change from server:
+2023-05-31 11:39:57 Item "ns=3;i=1003", Value = Double(-1.002516)
+2023-05-31 11:39:59 Data change from server:
+2023-05-31 11:39:59 Item "ns=3;i=1003", Value = Double(-1.673301)
+2023-05-31 11:40:01 Data change from server:
+2023-05-31 11:40:01 Item "ns=3;i=1003", Value = Double(1.587115)
+2023-05-31 11:40:03 Data change from server:
+2023-05-31 11:40:03 Item "ns=3;i=1003", Value = Double(0.9163301)
+2023-05-31 11:40:05 Data change from server:
+2023-05-31 11:40:05 Item "ns=3;i=1003", Value = Double(-1.952451)
+2023-05-31 11:40:07 Data change from server:
+2023-05-31 11:40:07 Item "ns=3;i=1003", Value = Double(1.285033)
+2023-05-31 11:40:09 Data change from server:
+2023-05-31 11:40:09 Item "ns=3;i=1003", Value = Double(0.2702553)
+2023-05-31 11:40:11 Data change from server:
+2023-05-31 11:40:11 Item "ns=3;i=1003", Value = Double(-0.492261)
+2023-05-31 11:40:13 Data change from server:
+2023-05-31 11:40:13 Item "ns=3;i=1003", Value = Double(0.6389578)
+2023-05-31 11:40:15 Data change from server:
+2023-05-31 11:40:15 Item "ns=3;i=1003", Value = Double(-0.03182722)
+2023-05-31 11:40:16 Data change from server:
+2023-05-31 11:40:16 Item "ns=3;i=1003", Value = Double(-0.7714108)
+2023-05-31 11:40:19 Data change from server:
+2023-05-31 11:40:19 Item "ns=3;i=1003", Value = Double(-1.442196)
+2023-05-31 11:40:21 Data change from server:
+2023-05-31 11:40:21 Item "ns=3;i=1003", Value = Double(-0.310977)
+2023-05-31 11:40:23 Data change from server:
+2023-05-31 11:40:23 Item "ns=3;i=1003", Value = Double(-1.073493)
+2023-05-31 11:40:25 Data change from server:
+2023-05-31 11:40:25 Item "ns=3;i=1003", Value = Double(-1.721345)
+2023-05-31 11:40:27 Data change from server:
+2023-05-31 11:40:27 Item "ns=3;i=1003", Value = Double(1.516138)
+2023-05-31 11:40:29 Data change from server:
+2023-05-31 11:40:29 Item "ns=3;i=1003", Value = Double(-1.352643)
+2023-05-31 11:40:31 Data change from server:
+2023-05-31 11:40:31 Item "ns=3;i=1003", Value = Double(-0.9226526)
