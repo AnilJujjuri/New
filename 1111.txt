@@ -37,3 +37,48 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+import can
+import time
+from threading import Thread
+
+
+def send_can_message(bus, message_id, message_data):
+    message = can.Message(
+        arbitration_id=message_id,
+        data=message_data,
+        is_extended_id=False
+    )
+    bus.send(message)
+    print(f"Sent message: ID=0x{message_id:x}, Data={message_data}")
+
+
+def receive_can_messages(bus):
+    while True:
+        message = bus.recv()
+        if message is not None:
+            print(f"Received message: ID=0x{message.arbitration_id:x}, Data={message.data}")
+
+
+def periodic_message_sender(bus):
+    for message_id in range(0x64, 0xC9):
+        message_data = [170, 187, 204]
+        send_can_message(bus, message_id, message_data)
+        time.sleep(1)
+
+
+def main():
+    bus = can.Bus(interface='virtual', channel='vcan0')
+    receiver_thread = Thread(target=receive_can_messages, args=(bus,))
+    sender_thread = Thread(target=periodic_message_sender, args=(bus,))
+
+    receiver_thread.start()
+    sender_thread.start()
+
+    sender_thread.join()
+    bus.shutdown()
+
+
+if __name__ == "__main__":
+    main()
