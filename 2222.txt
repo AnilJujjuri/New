@@ -22,3 +22,74 @@ Traceback (most recent call last):
   File "d:\OneDrive - LTTS\Desktop\Can_basic\EdgeSolution\EdgeSolution\modules\SampleModule\new1.py", line 23, in receive_can_messages
     print(f"Exception in thread{Thread.current_thread().name}:{e}")
 AttributeError: type object 'Thread' has no attribute 'current_thread'
+import can
+
+import time
+
+from threading import Thread
+
+def send_can_message(bus, message_id, message_data):
+
+    message = can.Message(
+
+        arbitration_id=message_id,
+
+        data=message_data,
+
+        is_extended_id=False
+
+    )
+
+    bus.send(message)
+
+    print(f"Sent message: ID=0x{message_id:x}, Data={message_data}")
+
+def receive_can_messages(bus, is_bus_open):
+
+    try:
+
+        while is_bus_open:
+
+            message = bus.recv(timeout=1)
+
+            if message is not None:
+
+                print(f"Received message: ID=0x{message.arbitration_id:x}, Data={message.data}")
+
+    except Exception as e:
+
+        print(f"Exception in thread {Thread.current_thread().name}: {e}")
+
+def periodic_message_sender(bus, is_bus_open):
+
+    for message_id in range(0xC7, 0xC9):
+
+        message_data = [170, 187, 204]
+
+        send_can_message(bus, message_id, message_data)
+
+        time.sleep(1)
+
+    is_bus_open = False
+
+def main():
+
+    bus = can.Bus(interface='virtual', channel='vcan0')
+
+    is_bus_open = True
+
+    receiver_thread = Thread(target=receive_can_messages, args=(bus, is_bus_open))
+
+    sender_thread = Thread(target=periodic_message_sender, args=(bus, is_bus_open))
+
+    receiver_thread.start()
+
+    sender_thread.start()
+
+    sender_thread.join()
+
+    bus.shutdown()
+
+if __name__ == "__main__":
+
+    main()
