@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import can
-import time
 from threading import Thread
 
 app = Flask(__name__)
@@ -36,7 +35,7 @@ def api_send_message():
     send_can_message(message_id, message_data)
     return 'Message sent'
 
-@app.route('/api/receive_messages', methods=['GET'])
+@app.route('/api/receive_messages/', methods=['GET'])  # Add a trailing slash here
 def api_receive_messages():
     return jsonify({'messages': received_messages})
 
@@ -61,18 +60,5 @@ def api_stop():
     else:
         return 'API is not running'
 
-def send_periodic_message():
-    while True:
-        if bus is not None:
-            # Simulate sending a periodic CAN message
-            message_id = '123'
-            message_data = '010203'
-            send_can_message(message_id, message_data)
-
-        time.sleep(1)  # Wait for 1 second
-
 if __name__ == '__main__':
-    sender_thread = Thread(target=send_periodic_message)
-    sender_thread.start()
-
     app.run(port=8040, debug=True)
