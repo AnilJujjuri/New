@@ -1,53 +1,43 @@
-Client created and connected
-Session created
-root node obtained: i=84
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\opc\main.py", line 23, in <module>
-    node = root_node.get_child([
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\node.py", line 471, in get_child
-    result = self.server.translate_browsepaths_to_nodeids([bpath])
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 427, in translate_browsepaths_to_nodeids
-    data = self._uasocket.send_request(request)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 81, in send_request
-    future = self._send_request(request, callback, timeout, message_type)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 55, in _send_request
-    binreq = struct_to_binary(request)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
-    packet.append(to_binary(uatype, val))
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
-    return struct_to_binary(val)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 256, in struct_to_binary
-    packet.append(list_to_binary(uatype[6:], val))
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in list_to_binary
-    pack = [to_binary(uatype, el) for el in val]
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in <listcomp>
-    pack = [to_binary(uatype, el) for el in val]
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
-    return struct_to_binary(val)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
-    packet.append(to_binary(uatype, val))
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
-    return struct_to_binary(val)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 256, in struct_to_binary
-    packet.append(list_to_binary(uatype[6:], val))
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in list_to_binary
-    pack = [to_binary(uatype, el) for el in val]
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 296, in <listcomp>
-    pack = [to_binary(uatype, el) for el in val]
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 284, in to_binary
-    return struct_to_binary(val)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
-    packet.append(to_binary(uatype, val))
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 274, in to_binary
-    return pack_uatype(vtype, val)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 194, in pack_uatype
-    return struct_to_binary(value)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
-    packet.append(to_binary(uatype, val))
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 274, in to_binary
-    return pack_uatype(vtype, val)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 184, in pack_uatype
-    return getattr(Primitives, vtype.name).pack(value)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 69, in pack
-    string = string.encode('utf-8')
-AttributeError: 'tuple' object has no attribute 'encode'
+app = Flask(__name__)
+
+# Simulated CAN message storage
+received_messages = []
+
+# Simulated periodic message sender
+def send_periodic_message():
+    while True:
+        # Simulate sending a periodic CAN message
+        message = {'id': 0x123, 'data': [0x01, 0x02, 0x03]}
+        received_messages.append(message)
+
+        time.sleep(1)  # Wait for 1 second
+
+# Start the periodic message sender in a separate thread
+import threading
+t = threading.Thread(target=send_periodic_message)
+t.start()
+
+# API endpoint to retrieve received messages
+@app.route('/api/messages', methods=['GET'])
+def get_messages():
+    return jsonify(received_messages)
+
+# API endpoint to send a CAN message
+@app.route('/api/messages', methods=['POST'])
+def send_message():
+    if not request.json or 'id' not in request.json or 'data' not in request.json:
+        return jsonify({'error': 'Invalid request'}), 400
+
+    message = {
+        'id': request.json['id'],
+        'data': request.json['data']
+    }
+
+    # Simulate receiving a CAN message
+    received_messages.append(message)
+
+    return jsonify({'success': True}), 201
+
+# Run the Flask application
+if __name__ == '__main__':
+    app.run(port=8040,debug=True)
