@@ -1,43 +1,78 @@
-app = Flask(__name__)
+from flask import Flask, request, jsonify
+import can
+import time
+from threading import Thread
 
-# Simulated CAN message storage
+app = Flask(__name__)
+bus = None
 received_messages = []
 
-# Simulated periodic message sender
+def send_can_message(message_id, message_data):
+    message = can.Message(
+        arbitration_id=int(message_id, 16),
+        data=bytes.fromhex(message_data),
+        is_extended_id=False
+    )
+    bus.send(message)
+    print(f"Sent message: ID=0x{message_id}, Data={message_data}")
+
+def receive_can_messages():
+    try:
+        while True:
+            message = bus.recv(timeout=1)
+            if message is not None:
+                print(f"Received message: ID=0x{message.arbitration_id:x}, Data={message.data}")
+                received_messages.append({
+                    'id': message.arbitration_id,
+                    'data': message.data.hex(),
+                })
+    except Exception as e:
+        print(f"Exception: {str(e)}")
+
+@app.route('/api/send_message', methods=['POST'])
+def api_send_message():
+    message_id = request.form.get('id')
+    message_data = request.form.get('data')
+    send_can_message(message_id, message_data)
+    return 'Message sent'
+
+@app.route('/api/receive_messages', methods=['GET'])
+def api_receive_messages():
+    return jsonify({'messages': received_messages})
+
+@app.route('/api/start', methods=['POST'])
+def api_start():
+    global bus
+    if bus is None:
+        bus = can.interface.Bus(bustype='virtual', channel='vcan0')
+        receiver_thread = Thread(target=receive_can_messages)
+        receiver_thread.start()
+        return 'API started'
+    else:
+        return 'API is already running'
+
+@app.route('/api/stop', methods=['POST'])
+def api_stop():
+    global bus
+    if bus is not None:
+        bus.shutdown()
+        bus = None
+        return 'API stopped'
+    else:
+        return 'API is not running'
+
 def send_periodic_message():
     while True:
-        # Simulate sending a periodic CAN message
-        message = {'id': 0x123, 'data': [0x01, 0x02, 0x03]}
-        received_messages.append(message)
+        if bus is not None:
+            # Simulate sending a periodic CAN message
+            message_id = '123'
+            message_data = '010203'
+            send_can_message(message_id, message_data)
 
         time.sleep(1)  # Wait for 1 second
 
-# Start the periodic message sender in a separate thread
-import threading
-t = threading.Thread(target=send_periodic_message)
-t.start()
-
-# API endpoint to retrieve received messages
-@app.route('/api/messages', methods=['GET'])
-def get_messages():
-    return jsonify(received_messages)
-
-# API endpoint to send a CAN message
-@app.route('/api/messages', methods=['POST'])
-def send_message():
-    if not request.json or 'id' not in request.json or 'data' not in request.json:
-        return jsonify({'error': 'Invalid request'}), 400
-
-    message = {
-        'id': request.json['id'],
-        'data': request.json['data']
-    }
-
-    # Simulate receiving a CAN message
-    received_messages.append(message)
-
-    return jsonify({'success': True}), 201
-
-# Run the Flask application
 if __name__ == '__main__':
-    app.run(port=8040,debug=True)
+    sender_thread = Thread(target=send_periodic_message)
+    sender_thread.start()
+
+    app.run(port=8040, debug=True)
