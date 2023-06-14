@@ -54,3 +54,7 @@ def send_message():
 # Run the Flask application
 if __name__ == '__main__':
     app.run()
+    curl -X POST -H "Content-Type: application/json" -d '{"id": "0x123", "data": "010203"}' http://localhost:5000/api/messages
+
+    
+    
