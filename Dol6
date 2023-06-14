@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify, request
 import time
 
@@ -8,10 +9,19 @@ received_messages = []
 
 # Simulated periodic message sender
 def send_periodic_message():
+    devices = range(1, 101)  # Devices from 1 to 100
+
     while True:
-        # Simulate sending a periodic CAN message
-        message = {'id': 0x321, 'data': [0x09, 0x07, 0x06]}
-        received_messages.append(message)
+        for device in devices:
+            # Modify the data for each device according to your requirements
+            if device % 2 == 0:
+                data = [0x01, 0x02, 0x03]
+            else:
+                data = [0x04, 0x05, 0x06]
+
+            # Simulate sending a CAN message for each device with modified data
+            message = {'id': device, 'data': data}
+            received_messages.append(message)
 
         time.sleep(1)  # Wait for 1 second
 
@@ -43,4 +53,4 @@ def send_message():
 
 # Run the Flask application
 if __name__ == '__main__':
-	main()
+    app.run()
