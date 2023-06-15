@@ -63,3 +63,7 @@ def api_stop():
 
 if __name__ == '__main__':
     app.run()
+curl -X POST -H "Content-Type: application/json" -d '{"id": "123", "data": "112233"}' http://localhost:5000/api/send_message
+
+
+curl http://localhost:5000/api/receive_messages
