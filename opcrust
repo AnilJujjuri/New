@@ -1,4 +1,53 @@
-exception calling callback for <Future at 0x26411c2ac80 state=finished returned Buffer>
+from datetime import time
+from opcua import Client, ua
+from opcua.ua import DataChangeTrigger
+# OPC UA server endpoint URL
+server_url = "opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer"
+
+# Connect to the OPC UA server
+client = Client(server_url)
+client.connect()
+
+# Get the root node
+root = client.get_root_node()
+
+# Create a session
+session = client.create_session()
+
+# Create a subscription
+subscription = client.create_subscription(500, DataChangeTrigger.StatusValue)
+
+# Create a data change callback function
+def data_change_notification(subscription, data):
+    for data_value in data.MonitoredItems:
+        print("Data change from server:")
+        node_id = data_value.Node.NodeId
+        value = data_value.Value.Value
+        print(f"Item '{node_id}', Value = {value}")
+
+# Subscribe to data changes
+handler = subscription.subscribe_data_change(data_change_notification)
+
+# Run continuously
+while True:
+    # Update the values of the variables (you can modify this part as needed)
+    for var_node in root.get_children():
+        if var_node.get_node_class() == ua.NodeClass.Variable:
+            # Generate a new value
+            new_value = var_node.get_value() + 1
+
+            # Set the new value to the variable
+            var_node.set_value(new_value)
+
+    # Sleep for a certain interval (e.g., 1 second)
+    time.sleep(1)
+
+# Cleanup (will never be reached in this case)
+subscription.unsubscribe(handler)
+session.close()
+client.disconnect()
+
+exception calling callback for <Future at 0x20b1d42acb0 state=finished returned Buffer>
 Traceback (most recent call last):
   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py", line 342, in _invoke_callbacks
     callback(self)
@@ -21,7 +70,7 @@ Traceback (most recent call last):
 opcua.common.utils.NotEnoughData: Not enough data left in buffer, request for 4, we have Buffer(size:0, data:b'')
 Traceback (most recent call last):
   File "d:\OneDrive - LTTS\Desktop\OPCRUST\main.py", line 18, in <module>
-    subscription = client.create_subscription(500, lambda : None)
+    subscription = client.create_subscription(500, DataChangeTrigger.StatusValue)
   File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\client.py", line 565, in create_subscription
     return Subscription(self.uaclient, params, handler)
   File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\subscription.py", line 93, in __init__
@@ -31,60 +80,3 @@ Traceback (most recent call last):
   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py", line 460, in result
     raise TimeoutError()
 concurrent.futures._base.TimeoutError
-
-from opcua import Client
-from opcua import ua
-
-# Create a client and connect to the OPC UA server
-client = Client("opc.tcp://localhost:4840/freeopcua/server/")
-client.connect()
-print("Client created")
-
-# Create a session
-session = client.create_session()
-print("Session created")
-
-# Write a value to the server
-node = session.get_node("ns=3;i=1003")
-value_to_write = 42.0
-node.set_value(value_to_write)
-print("Value written successfully")
-
-# Create a subscription
-handler = lambda: None
-subscription = session.create_subscription(500, handler)
-print("Subscription created")
-
-# Subscribe to the data change event
-subscription.subscribe_data_change(node)
-print("Subscribed")
-
-# Continuous data change handling loop
-while True:
-    # Wait for data change events
-    data_changes = subscription.wait_for_events()
-    
-    # Process received data changes
-    for data_change in data_changes:
-        if data_change.Value is not None:
-            print("Data change from server:")
-            print(f"Item {data_change.NodeId}, Value = {data_change.Value}")
-    
-    # Break the loop if desired condition is met
-    # For example, you can use a flag or a specific value to stop the loop
-    # if some condition is satisfied
-    
-    # Add a delay or sleep to control the rate of data change handling
-    # For example, you can use the time.sleep() function to introduce a delay
-    
-# Disconnect from the server
-client.disconnect()
-
-
-Running] python -u "d:\OneDrive - LTTS\Desktop\OPCRUST\app.py"
-Client created
-Session created
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\OPCRUST\app.py", line 14, in <module>
-    node = session.get_node("ns=3;i=1003")
-AttributeError: 'CreateSessionResult' object has no attribute 'get_node'
