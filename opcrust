@@ -79,3 +79,12 @@ while True:
     
 # Disconnect from the server
 client.disconnect()
+
+
+Running] python -u "d:\OneDrive - LTTS\Desktop\OPCRUST\app.py"
+Client created
+Session created
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\OPCRUST\app.py", line 14, in <module>
+    node = session.get_node("ns=3;i=1003")
+AttributeError: 'CreateSessionResult' object has no attribute 'get_node'
