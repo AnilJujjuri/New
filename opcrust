@@ -12,17 +12,18 @@ client.connect()
 root = client.get_root_node()
 
 # Create a session
-session=client.create_session()
+session = client.create_session()
 
 # Create a subscription
-subscription = client.create_subscription(500, ua.SubscriptionDiagnosticsDataType())
+subscription = session.create_subscription(500, ua.SubscriptionDiagnosticsDataType)
 
 # Create a data change callback function
-def data_change_notification(subscription, notifications):
-    for notification in notifications:
-        for data_value in notification.Value.DataChangeNotification.MonitoredItems:
-            print("Data change from server:")
-            print("Item '{}', Value = {}".format(data_value.NodeId, data_value.Value.Value))
+def data_change_notification(subscription, data):
+    for data_value in data.MonitoredItems:
+        print("Data change from server:")
+        node_id = data_value.Node.NodeId
+        value = data_value.Value.Value
+        print(f"Item '{node_id}', Value = {value}")
 
 # Subscribe to data changes
 handler = subscription.subscribe_data_change(data_change_notification)
@@ -46,38 +47,3 @@ subscription.unsubscribe(handler)
 session.close()
 client.disconnect()
 
-
-
-exception calling callback for <Future at 0x157e742ef20 state=finished returned Buffer>
-Traceback (most recent call last):
-  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py", line 342, in _invoke_callbacks
-    callback(self)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 445, in _create_subscription_callback
-    response = struct_from_binary(ua.CreateSubscriptionResponse, data)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 505, in struct_from_binary
-    val = from_binary(uatype, data)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 486, in from_binary
-    return struct_from_binary(uatype, data)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 505, in struct_from_binary
-    val = from_binary(uatype, data)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 482, in from_binary
-    return unpack_uatype(vtype, data)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 200, in unpack_uatype
-    return st.unpack(data)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 138, in unpack
-    return struct.unpack(self.format, data.read(self.size))[0]
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\utils.py", line 65, in read
-    raise NotEnoughData("Not enough data left in buffer, request for {0}, we have {1}".format(size, self))
-opcua.common.utils.NotEnoughData: Not enough data left in buffer, request for 4, we have Buffer(size:0, data:b'')
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\OPCRUST\main.py", line 18, in <module>
-    subscription = client.create_subscription(500, ua.SubscriptionDiagnosticsDataType())
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\client.py", line 565, in create_subscription
-    return Subscription(self.uaclient, params, handler)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\subscription.py", line 93, in __init__
-    response = self.server.create_subscription(
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 440, in create_subscription
-    return resp_fut.result(self._timeout)
-  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py", line 460, in result
-    raise TimeoutError()
-concurrent.futures._base.TimeoutError
