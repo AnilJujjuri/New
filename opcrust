@@ -5,3 +5,53 @@ Created
 Subscribed
 Data change from server:
 Item "ns=3;i=1003", Value = Double(1.914401)
+
+from opcua import Client, ua
+
+# OPC UA server endpoint URL
+server_url = "opc.tcp://localhost:4840/freeopcua/server/"
+
+# Connect to the OPC UA server
+client = Client(server_url)
+client.connect()
+
+# Get the root node
+root = client.get_root_node()
+
+# Create a session
+session = client.create_session()
+
+# Create a subscription
+subscription = session.create_subscription(500, ua.SubscriptionDiagnosticsDataType())
+
+# Create a data change callback function
+def data_change_notification(subscription, notifications):
+    for notification in notifications:
+        for data_value in notification.Value.MonitoredItems:
+            print("Data change from server:")
+            print("Item '{}', Value = {}".format(data_value.NodeId, data_value.Value))
+
+# Subscribe to data changes
+handler = subscription.subscribe_data_change(data_change_notification)
+
+# Run continuously
+while True:
+    # Iterate through variables and update their values
+    for var_node in root.get_children():
+        if var_node.get_node_class() == ua.NodeClass.Variable:
+            # Get the current value
+            current_value = var_node.get_value()
+
+            # Generate a new value (you can modify this part as needed)
+            new_value = current_value + 1
+
+            # Set the new value to the variable
+            var_node.set_value(new_value)
+
+    # Sleep for a certain interval (e.g., 1 second)
+    time.sleep(1)
+
+# Cleanup (will never be reached in this case)
+subscription.unsubscribe(handler)
+session.stop()
+client.disconnect()
