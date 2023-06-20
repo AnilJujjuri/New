@@ -15,7 +15,7 @@ root = client.get_root_node()
 session = client.create_session()
 
 # Create a subscription
-subscription = session.create_subscription(500, ua.SubscriptionDiagnosticsDataType)
+subscription = client.create_subscription(500, ua.ClientSubscription())
 
 # Create a data change callback function
 def data_change_notification(subscription, data):
@@ -46,8 +46,3 @@ while True:
 subscription.unsubscribe(handler)
 session.close()
 client.disconnect()
-
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\OPCRUST\main.py", line 18, in <module>
-    subscription = session.create_subscription(500, ua.SubscriptionDiagnosticsDataType)
-AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
