@@ -47,3 +47,7 @@ subscription.unsubscribe(handler)
 session.close()
 client.disconnect()
 
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\OPCRUST\main.py", line 18, in <module>
+    subscription = session.create_subscription(500, ua.SubscriptionDiagnosticsDataType)
+AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
