@@ -31,3 +31,51 @@ Traceback (most recent call last):
   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py", line 460, in result
     raise TimeoutError()
 concurrent.futures._base.TimeoutError
+
+from opcua import Client
+from opcua import ua
+
+# Create a client and connect to the OPC UA server
+client = Client("opc.tcp://localhost:4840/freeopcua/server/")
+client.connect()
+print("Client created")
+
+# Create a session
+session = client.create_session()
+print("Session created")
+
+# Write a value to the server
+node = session.get_node("ns=3;i=1003")
+value_to_write = 42.0
+node.set_value(value_to_write)
+print("Value written successfully")
+
+# Create a subscription
+handler = lambda: None
+subscription = session.create_subscription(500, handler)
+print("Subscription created")
+
+# Subscribe to the data change event
+subscription.subscribe_data_change(node)
+print("Subscribed")
+
+# Continuous data change handling loop
+while True:
+    # Wait for data change events
+    data_changes = subscription.wait_for_events()
+    
+    # Process received data changes
+    for data_change in data_changes:
+        if data_change.Value is not None:
+            print("Data change from server:")
+            print(f"Item {data_change.NodeId}, Value = {data_change.Value}")
+    
+    # Break the loop if desired condition is met
+    # For example, you can use a flag or a specific value to stop the loop
+    # if some condition is satisfied
+    
+    # Add a delay or sleep to control the rate of data change handling
+    # For example, you can use the time.sleep() function to introduce a delay
+    
+# Disconnect from the server
+client.disconnect()
