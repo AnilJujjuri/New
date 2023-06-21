@@ -1,66 +1,20 @@
-
-from opcua import ua, Client
-
-def data_change_callback(subscription, data):
-    print("Data change from server:")
-    for item in data.MonitoredItems:
-        print_value(item)
-
-def print_value(item):
-    node_id = item.MonitoredItemId
-    data_value = item.Value
-    if data_value is not None:
-        print(f"Item \"{node_id}\", Value = {data_value.Value}")
-    else:
-        print(f"Item \"{node_id}\", Value not found")
-
-def subscribe_to_values(client):
-    # Create a subscription polling every 2s with a callback
-    subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
-    subscription.data_change_notification(callback=data_change_callback)
-
-    # Create some monitored items
-    items_to_create = [1003, 1008, 1009, 1010]  # Replace with the correct Node IDs
-    items = []
-    for node_id in items_to_create:
-        item = ua.MonitoredItemCreateRequest(
-            item_to_monitor=ua.ReadValueId(
-                node_id=ua.NodeId(node_id, 3),  # Replace with the correct Node IDs
-                attribute_id=ua.AttributeIds.Value,
-            ),
-            monitoring_mode=ua.MonitoringMode.Reporting,
-            requested_parameters=ua.MonitoringParameters(
-                sampling_interval=100,
-                queue_size=10,
-                discard_oldest=True
-            )
-        )
-        items.append(item)
-
-    subscription.create_monitored_items(items)
-
-    print("Subscribed")
-    subscription.activate()
-
-def main():
-    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
-    client.application_uri = "urn:PythonClient"
-
-    try:
-        client.connect()
-
-        # Create a session
-        session = client.create_session()
-        print("Session created")
-
-        # Subscribe to values
-        subscribe_to_values(client.uaclient)
-
-        input("Press Enter to exit...\n")
-
-    finally:
-        client.disconnect()
-        print("Client disconnected")
-
-if __name__ == "__main__":
+Session created
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 66, in <module>
     main()
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 57, in main
+    subscribe_to_values(client.uaclient)
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 19, in subscribe_to_values
+    subscription = client.create_subscription(500, ua.SubscriptionDiagnosticsDataType())
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 439, in create_subscription
+Client disconnected
+    self._uasocket.send_request(request, mycallbak)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 81, in send_request
+    future = self._send_request(request, callback, timeout, message_type)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 55, in _send_request
+    binreq = struct_to_binary(request)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
+    packet.append(to_binary(uatype, val))
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 286, in to_binary
+    raise UaError("No known way to pack {} of type {} to ua binary".format(val, uatype))
+opcua.ua.uaerrors._base.UaError: No known way to pack 500 of type CreateSubscriptionParameters to ua binary
