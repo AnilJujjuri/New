@@ -1,81 +1,59 @@
-from opcua import Client, ua
-
-
-def main():
-    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
-    client.application_uri = "urn:PythonClient"
-    client.session_retry_limit = 3
-    client.connect()
-
-    print("Client created")
-
-    try:
-        session = client.create_session()
-        print("Session created")
-
-        subscribe_to_values(client)
-
-        # Run the session (this blocks the execution until the session is closed)
-        session.run()
-
-    finally:
-        client.disconnect()
-        print("Client disconnected")
-
-
-def subscribe_to_values(client):
-    # Create a subscription and monitored items
+Client created
+Session created
+exception calling callback for <Future at 0x183b1627d60 state=finished returned Buffer>
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py", line 342, in _invoke_callbacks
+    callback(self)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 445, in _create_subscription_callback
+    response = struct_from_binary(ua.CreateSubscriptionResponse, data)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 505, in struct_from_binary
+    val = from_binary(uatype, data)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 486, in from_binary
+    return struct_from_binary(uatype, data)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 505, in struct_from_binary
+    val = from_binary(uatype, data)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 482, in from_binary
+    return unpack_uatype(vtype, data)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 200, in unpack_uatype
+    return st.unpack(data)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 138, in unpack
+    return struct.unpack(self.format, data.read(self.size))[0]
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\utils.py", line 65, in read
+    raise NotEnoughData("Not enough data left in buffer, request for {0}, we have {1}".format(size, self))
+opcua.common.utils.NotEnoughData: Not enough data left in buffer, request for 4, we have Buffer(size:0, data:b'')
+ServiceFault from server received  in response to CloseSessionRequest
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 16, in main
+    subscribe_to_values(client)
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 28, in subscribe_to_values
     subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
-    print("Subscription created")
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\client.py", line 565, in create_subscription
+    return Subscription(self.uaclient, params, handler)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\subscription.py", line 93, in __init__
+    response = self.server.create_subscription(
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 440, in create_subscription
+    return resp_fut.result(self._timeout)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py", line 460, in result
+    raise TimeoutError()
+concurrent.futures._base.TimeoutError
 
-    # Define the data change callback function
-    def data_change_callback(subscription, data):
-        print("Data change from server:")
-        for item in data.MonitoredItems:
-            print_value(item)
+During handling of the above exception, another exception occurred:
 
-    # Set the callback function for data change notifications
-    subscription.data_change_notification(callback=data_change_callback)
-
-    # Create the monitored items
-    nodes_to_monitor = [
-        ua.NodeId(3, 1003),
-        ua.NodeId(3, 1008),
-        ua.NodeId(3, 1009),
-        ua.NodeId(3, 1010)
-    ]
-    items_to_create = [
-        ua.MonitoredItemCreateRequest(
-            MonitoringMode=ua.MonitoringMode.Reporting,
-            RequestedParameters=ua.MonitoringParameters(
-                ClientHandle=1,
-                SamplingInterval=0,
-                Filter=ua.EventFilter(),
-                QueueSize=1,
-                DiscardOldest=True
-            ),
-            ItemToMonitor=ua.ReadValueId(
-                NodeId=node,
-                AttributeId=ua.AttributeIds.Value,
-                IndexRange=None,
-                DataEncoding=None
-            )
-        )
-        for node in nodes_to_monitor
-    ]
-    subscription.create_monitored_items(items_to_create)
-
-    print("Monitored items created")
-
-
-def print_value(item):
-    node_id = item.ItemToMonitor.NodeId
-    data_value = item.LastValue.Value
-    if data_value is not None:
-        print(f"Item '{node_id}', Value: {data_value}")
-    else:
-        print(f"Item '{node_id}', Value not found, Error: {item.LastValue.StatusCode}")
-
-
-if __name__ == '__main__':
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 81, in <module>
     main()
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 22, in main
+    client.disconnect()
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\client.py", line 298, in disconnect
+    self.close_session()
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\client.py", line 523, in close_session
+    return self.uaclient.close_session(True)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 312, in close_session
+    data = self._uasocket.send_request(request)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 84, in send_request
+    self.check_answer(data, " in response to " + request.__class__.__name__)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 93, in check_answer
+    hdr.ServiceResult.check()
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\uatypes.py", line 218, in check
+    raise UaStatusCodeError(self.value)
+opcua.ua.uaerrors._auto.BadSessionIdInvalid: "The session id is not valid."(BadSessionIdInvalid)
