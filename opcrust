@@ -1,72 +1,10 @@
-from opcua import Client, ua
-
-def data_change_callback(changed_monitored_items):
-    print("Data change from server:")
-    for item in changed_monitored_items:
-        print_value(item)
-
-def print_value(item):
-    node_id = item.get_item_to_monitor().node_id
-    data_value = item.get_last_value()
-    if data_value and data_value.Value:
-        print(f"Item \"{node_id}\", Value = {data_value.Value}")
-    else:
-        print(f"Item \"{node_id}\", Value not found, error: {data_value.StatusCode}")
-
-def subscribe_to_values(session):
-    # Create a subscription polling every 2s with a callback
-    subscription_id = session.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
-    items_to_create = [1003, 1008, 1009, 1010]  # Replace with the correct Node IDs
-
-    # Create some monitored items
-    items = []
-    for node_id in items_to_create:
-        items.append(ua.MonitoredItemCreateRequest(
-            client_handle=node_id,
-            item_to_monitor=ua.ReadValueId(
-                node_id=ua.NodeId(node_id, 3),  # Replace with the correct Node IDs
-                attribute_id=ua.AttributeIds.Value,
-                data_encoding=None
-            ),
-            monitoring_mode=ua.MonitoringMode.Reporting,
-            requested_parameters=ua.MonitoringParameters(
-                client_handle=node_id,
-                sampling_interval=100,
-                filter=ua.ExtensionObject(),
-                queue_size=10,
-                discard_oldest=True
-            )
-        ))
-
-    result = session.create_monitored_items(subscription_id, items)
-    if result.StatusCodes:
-        print("Monitored items created successfully")
-    else:
-        print("Error creating monitored items")
-
-    print("Subscribed")
-    session.activate_subscription(subscription_id)
-
-def main():
-    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
-    client.application_uri = "urn:PythonClient"
-
-    try:
-        client.connect()
-
-        # Create a session
-        session = client.create_session()
-        print("Session created")
-
-        # Subscribe to values
-        subscribe_to_values(session)
-
-        # Run the session
-        session.run()
-
-    finally:
-        client.disconnect()
-        print("Client disconnected")
-
-if __name__ == "__main__":
+Session created
+Client disconnected
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 72, in <module>
     main()
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 62, in main
+    subscribe_to_values(session)
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 18, in subscribe_to_values
+    subscription_id = session.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
