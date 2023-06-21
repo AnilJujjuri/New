@@ -1,44 +1,6 @@
-from opcua import Client, ua
-
-def main():
-
-    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
-
-    #client.set_security_string("None")
-
-    client.connect()
-
-    print("Client created")
-
-    subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
-
-    subscription.subscribe_data_change(print_value)
-
-    print("Subscribed")
-
-    try:
-
-        while True:
-
-            pass
-
-    finally:
-
-        subscription.unsubscribe_data_change(print_value)
-
-        client.disconnect()
-
-def print_value(node, val, data):
-
-    print("Data change from server:")
-
-    print(f"Item \"{node}\" Value = {val}")
-
-if __name__ == "__main__":
-
-    main()Client created
+Client created
 Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 39, in <module>
+  File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 40, in <module>
     main()
   File "d:\OneDrive - LTTS\Desktop\opc\opcrust.py", line 15, in main
     subscription.subscribe_data_change(print_value)
@@ -50,5 +12,3 @@ Traceback (most recent call last):
     rv.NodeId = node.nodeid
 AttributeError: 'function' object has no attribute 'nodeid'
 NotificationMessage is None.
-
-
