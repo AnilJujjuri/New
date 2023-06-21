@@ -1,46 +1,72 @@
-from opcua import Client
-import time
+from opcua import Client, ua
 
-# OPC UA server endpoint URL
-server_url = "opc.tcp://localhost:4840/freeopcua/server/"
+def data_change_callback(changed_monitored_items):
+    print("Data change from server:")
+    for item in changed_monitored_items:
+        print_value(item)
 
-# Connect to the OPC UA server
-client = Client(server_url)
-client.connect()
+def print_value(item):
+    node_id = item.get_item_to_monitor().node_id
+    data_value = item.get_last_value()
+    if data_value and data_value.Value:
+        print(f"Item \"{node_id}\", Value = {data_value.Value}")
+    else:
+        print(f"Item \"{node_id}\", Value not found, error: {data_value.StatusCode}")
 
-# Get the root node
-root = client.get_root_node()
+def subscribe_to_values(session):
+    # Create a subscription polling every 2s with a callback
+    subscription_id = session.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+    items_to_create = [1003, 1008, 1009, 1010]  # Replace with the correct Node IDs
 
-# Create a session
-session = client.create_session()
+    # Create some monitored items
+    items = []
+    for node_id in items_to_create:
+        items.append(ua.MonitoredItemCreateRequest(
+            client_handle=node_id,
+            item_to_monitor=ua.ReadValueId(
+                node_id=ua.NodeId(node_id, 3),  # Replace with the correct Node IDs
+                attribute_id=ua.AttributeIds.Value,
+                data_encoding=None
+            ),
+            monitoring_mode=ua.MonitoringMode.Reporting,
+            requested_parameters=ua.MonitoringParameters(
+                client_handle=node_id,
+                sampling_interval=100,
+                filter=ua.ExtensionObject(),
+                queue_size=10,
+                discard_oldest=True
+            )
+        ))
 
-# Iterate to create data
-for i in range(10):
-    # Create a new variable node
-    var_node = root.add_variable(2, "MyVariable{}".format(i), i)
-    var_node.set_writable()  # Set the variable as writable
+    result = session.create_monitored_items(subscription_id, items)
+    if result.StatusCodes:
+        print("Monitored items created successfully")
+    else:
+        print("Error creating monitored items")
 
-    # Start the session
-    session.start()
+    print("Subscribed")
+    session.activate_subscription(subscription_id)
 
-    # Read the value of the variable
-    value = var_node.get_value()
+def main():
+    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
+    client.application_uri = "urn:PythonClient"
 
-    # Print the value
-    print("Value of MyVariable{}: {}".format(i, value))
+    try:
+        client.connect()
 
-    # Sleep for 1 second
-    time.sleep(1)
+        # Create a session
+        session = client.create_session()
+        print("Session created")
 
-    # Set a new value to the variable
-    new_value = i + 1
-    var_node.set_value(new_value)
+        # Subscribe to values
+        subscribe_to_values(session)
 
-    # Print the new value
-    print("New value of MyVariable{}: {}".format(i, new_value))
+        # Run the session
+        session.run()
 
-    # Stop the session
-    session.stop()
+    finally:
+        client.disconnect()
+        print("Client disconnected")
 
-# Disconnect from the server
-client.disconnect()
+if __name__ == "__main__":
+    main()
