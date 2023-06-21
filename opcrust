@@ -5,7 +5,6 @@ from opcua.ua.uaerrors import UaError
 
 def main():
     client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
-    client.set_security_string("None")
     client.application_uri = "urn:PythonClient"
     client.session_retry_limit = 3
     client.connect()
@@ -26,9 +25,9 @@ def main():
         print("Client disconnected")
 
 
-def subscribe_to_values(session):
+def subscribe_to_values(client):
     # Create a subscription and monitored items
-    subscription = session.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+    subscription =  client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
     print("Subscription created")
 
     # Define the data change callback function
@@ -82,3 +81,16 @@ def print_value(item):
 
 if __name__ == '__main__':
     main()
+
+
+Client created
+Session created
+Client disconnected
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 83, in <module>
+    main()
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 18, in main
+    subscribe_to_values(session)
+  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 30, in subscribe_to_values
+    subscription =  client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
