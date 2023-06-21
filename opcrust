@@ -12,3 +12,31 @@ Traceback (most recent call last):
     rv.NodeId = node.nodeid
 AttributeError: 'function' object has no attribute 'nodeid'
 NotificationMessage is None.
+from opcua import Client, ua
+
+def main():
+    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
+
+    client.connect()
+    print("Client created")
+
+    subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+
+    item = subscription.subscribe_data_change("ns=0;i=1", print_value)  # Replace "ns=0;i=1" with your desired node ID
+
+    print("Subscribed")
+
+    try:
+        while True:
+            pass
+    finally:
+        subscription.unsubscribe_data_change(item)
+
+        client.disconnect()
+
+def print_value(node, val, data):
+    print("Data change from server:")
+    print(f"Item \"{node}\" Value = {val}")
+
+if __name__ == "__main__":
+    main()
