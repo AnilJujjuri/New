@@ -1,20 +1,84 @@
-Session created
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 66, in <module>
+
+from opcua import Client, ua
+from opcua.ua.uaerrors import UaError
+
+
+def main():
+    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
+    client.set_security_string("None")
+    client.application_uri = "urn:PythonClient"
+    client.session_retry_limit = 3
+    client.connect()
+
+    print("Client created")
+
+    try:
+        session = client.create_session()
+        print("Session created")
+
+        subscribe_to_values(session)
+
+        # Run the session (this blocks the execution until the session is closed)
+        session.run()
+
+    finally:
+        client.disconnect()
+        print("Client disconnected")
+
+
+def subscribe_to_values(session):
+    # Create a subscription and monitored items
+    subscription = session.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+    print("Subscription created")
+
+    # Define the data change callback function
+    def data_change_callback(subscription, data):
+        print("Data change from server:")
+        for item in data.MonitoredItems:
+            print_value(item)
+
+    # Set the callback function for data change notifications
+    subscription.data_change_notification(callback=data_change_callback)
+
+    # Create the monitored items
+    nodes_to_monitor = [
+        ua.NodeId(3, 1003),
+        ua.NodeId(3, 1008),
+        ua.NodeId(3, 1009),
+        ua.NodeId(3, 1010)
+    ]
+    items_to_create = [
+        ua.MonitoredItemCreateRequest(
+            MonitoringMode=ua.MonitoringMode.Reporting,
+            RequestedParameters=ua.MonitoringParameters(
+                ClientHandle=1,
+                SamplingInterval=0,
+                Filter=ua.EventFilter(),
+                QueueSize=1,
+                DiscardOldest=True
+            ),
+            ItemToMonitor=ua.ReadValueId(
+                NodeId=node,
+                AttributeId=ua.AttributeIds.Value,
+                IndexRange=None,
+                DataEncoding=None
+            )
+        )
+        for node in nodes_to_monitor
+    ]
+    subscription.create_monitored_items(items_to_create)
+
+    print("Monitored items created")
+
+
+def print_value(item):
+    node_id = item.ItemToMonitor.NodeId
+    data_value = item.LastValue.Value
+    if data_value is not None:
+        print(f"Item '{node_id}', Value: {data_value}")
+    else:
+        print(f"Item '{node_id}', Value not found, Error: {item.LastValue.StatusCode}")
+
+
+if __name__ == '__main__':
     main()
-  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 57, in main
-    subscribe_to_values(client.uaclient)
-  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 19, in subscribe_to_values
-    subscription = client.create_subscription(500, ua.SubscriptionDiagnosticsDataType())
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 439, in create_subscription
-Client disconnected
-    self._uasocket.send_request(request, mycallbak)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 81, in send_request
-    future = self._send_request(request, callback, timeout, message_type)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\client\ua_client.py", line 55, in _send_request
-    binreq = struct_to_binary(request)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 261, in struct_to_binary
-    packet.append(to_binary(uatype, val))
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\ua_binary.py", line 286, in to_binary
-    raise UaError("No known way to pack {} of type {} to ua binary".format(val, uatype))
-opcua.ua.uaerrors._base.UaError: No known way to pack 500 of type CreateSubscriptionParameters to ua binary
