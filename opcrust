@@ -10,8 +10,10 @@ def main():
     print("Client created")
 
     try:
-        session = create_session(client)
-        subscribe_to_values(session)
+        session = client.create_session()
+        print("Session created")
+
+        subscribe_to_values(client)
 
         # Run the session (this blocks the execution until the session is closed)
         session.run()
@@ -21,15 +23,9 @@ def main():
         print("Client disconnected")
 
 
-def create_session(client):
-    session = client.create_session()
-    print("Session created")
-    return session
-
-
-def subscribe_to_values(session):
+def subscribe_to_values(client):
     # Create a subscription and monitored items
-    subscription = session.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
+    subscription = client.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
     print("Subscription created")
 
     # Define the data change callback function
@@ -83,14 +79,3 @@ def print_value(item):
 
 if __name__ == '__main__':
     main()
-
-Session created
-Client disconnected
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 85, in <module>
-    main()
-  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 14, in main
-    subscribe_to_values(session)
-  File "d:\OneDrive - LTTS\Desktop\Shavali\main.py", line 32, in subscribe_to_values
-    subscription = session.create_subscription(2000, ua.SubscriptionDiagnosticsDataType())
-AttributeError: 'CreateSessionResult' object has no attribute 'create_subscription'
