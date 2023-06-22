@@ -93,3 +93,33 @@ if __name__ == "__main__":
         # Keep the program running to continue listening to CAN messages and updating the device twin
         while True:
             time.sleep(1)
+
+
+I am sending the testdata usinfg the below file
+
+from azure.iot.device import IoTHubModuleClient
+import logging
+
+from azurecom import CommunicationModule
+logger = logging.getLogger(__name__)
+
+can='vcan0'
+connection_string = "HostName=EDGTneerTrainingPractice.azure-devices.net;DeviceId=nodered;ModuleId=SimulatedTemperatureSensor;SharedAccessKey=v1cnONzs99unf3XKKACDfx0E69/bE5INBg/o0A7sKXw="
+client = IoTHubModuleClient.create_from_connection_string(connection_string)
+logger.info(f"self.client in connect if: {client}")
+print(client)
+# properties = client.get_twin()
+# print(properties)
+
+with CommunicationModule(connection_string=connection_string) as module:
+    properties=module.get_properties()
+    print(properties)
+
+
+    data_to_insert={"sensor_id":123,"temperature": 25.5,"humidity": 60.2}
+    module.update_property(data_to_insert)
+
+    properties=module.get_properties()
+    print(properties)
+
+do i need to modify anything i cant see the data in candump
