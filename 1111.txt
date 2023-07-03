@@ -1,35 +1,5 @@
-from opcua import Client
-from opcua import ua
-
-
-def print_value(node, data_value, _):
-    node_id = node.nodeid
-    value = data_value.Value.Value
-    print(f'Data change from server:')
-    print(f'Item "{node_id}", Value = {value}')
-
-
-if __name__ == '__main__':
-    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
-    client.connect()
-
-    print("Client created")
-
-    node_id = "ns=3;i=1012"
-    value = ua.Variant(20, ua.VariantType.Int16)
+Client created
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\waste\main.py", line 20, in <module>
     client.set_attribute(node_id, ua.AttributeIds.Value, value)
-
-    print("Value written successfully")
-
-    subscription = client.create_subscription(2000, None, print_value)
-    handle = subscription.subscribe_data_change("ns=3;i=1003")
-
-    print("Created")
-    print("Subscribed")
-
-    try:
-        while True:
-            pass
-    finally:
-        subscription.unsubscribe(handle)
-        client.disconnect()
+AttributeError: 'Client' object has no attribute 'set_attribute'
