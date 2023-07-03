@@ -3,19 +3,6 @@ from opcua import Client
 from opcua import ua
 
 
-class DataChangeHandler(object):
-    def __init__(self):
-        self.initialized = False
-
-    def datachange_notification(self, node, val, data):
-        if not self.initialized:
-            print("Data change from server:")
-            self.initialized = True
-        node_id = node.nodeid.to_string()
-        value = val.Value.Value
-        print(f"Item \"{node_id}\", Value = {value}")
-
-
 if __name__ == '__main__':
     client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
     client.connect()
@@ -26,9 +13,6 @@ if __name__ == '__main__':
 
     try:
         node = client.get_node(node_id)
-        handler = DataChangeHandler()
-        subscription = client.create_subscription(100, handler)
-        monitored_item = subscription.subscribe_data_change(node)
 
         value = 0
         while True:
@@ -41,5 +25,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         pass
 
-    subscription.delete()
     client.disconnect()
