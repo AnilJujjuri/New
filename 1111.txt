@@ -1,11 +1,36 @@
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\waste\main.py", line 42, in <module>
-    monitored_item = subscription.subscribe_data_change(item)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\subscription.py", line 197, in subscribe_data_change
-    return self._subscribe(nodes, attr, queuesize=queuesize)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\subscription.py", line 227, in _subscribe
-    mir = self._make_monitored_item_request(node, attr, mfilter, queuesize)
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\subscription.py", line 239, in _make_monitored_item_request
+from opcua import Client
+from opcua.ua import NodeId
+
+# Connect to the OPC UA server
+url = "opc.tcp://localhost:53530/OPCUA/SimulationServer"
+client = Client(url)
+client.connect()
+
+# Subscribe to data changes
+subscription = client.create_subscription(100, None)
+
+# Define the data change callback function
+def data_change_callback(node, data):
+    item = node.nodeid.to_string()
+    value = data.monitored_item.Value.Value
+    print(f'Data change from server:')
+    print(f'Item "{item}", Value = Double({value})')
+
+# Create a monitored item to track the data change
+item = NodeId("ns=3;i=1003")
+monitored_item = subscription.subscribe_data_change(item)
+monitored_item.add_callback(data_change_callback)
+
+# Keep the program running until manually interrupted
+try:
+    while True:
+        pass
+except KeyboardInterrupt:
+    pass
+
+# Disconnect from the server
+client.disconnect()
+packages\opcua\common\subscription.py", line 239, in _make_monitored_item_request
     rv.NodeId = node.nodeid
 AttributeError: 'str' object has no attribute 'nodeid'
 NotificationMessage is None.
