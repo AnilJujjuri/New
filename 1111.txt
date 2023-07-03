@@ -1,5 +1,45 @@
-Client created
-Traceback (most recent call last):
-  File "d:\OneDrive - LTTS\Desktop\waste\main.py", line 20, in <module>
-    client.set_attribute(node_id, ua.AttributeIds.Value, value)
-AttributeError: 'Client' object has no attribute 'set_attribute'
+from opcua import Client
+from opcua import ua
+
+
+class DataChangeHandler(object):
+    def __init__(self):
+        self.initialized = False
+
+    def datachange_notification(self, node, val, data):
+        if not self.initialized:
+            print("Data change from server:")
+            self.initialized = True
+        node_id = node.nodeid.to_string()
+        value = val.Value
+        print(f"Item \"{node_id}\", Value = {value}")
+
+
+if __name__ == '__main__':
+    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
+    client.connect()
+
+    print("Client created")
+
+    node_id = "ns=3;i=1012"
+    value = -0.941271
+
+    try:
+        node = client.get_node(node_id)
+        node.set_attribute(ua.AttributeIds.Value, ua.DataValue(value))
+        print("Value written successfully")
+    except Exception as e:
+        print(f"Error writing value: {e}")
+
+    handler = DataChangeHandler()
+    subscription = client.create_subscription(100, handler)
+    monitored_item = subscription.subscribe_data_change(node)
+    
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        pass
+
+    subscription.delete()
+    client.disconnect()
