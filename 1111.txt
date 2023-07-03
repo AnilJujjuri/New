@@ -1,3 +1,5 @@
+import random
+import time
 from opcua import Client
 from opcua import ua
 
@@ -22,22 +24,19 @@ if __name__ == '__main__':
     print("Client created")
 
     node_id = "ns=3;i=1012"
-    value = -0.941271
 
     try:
         node = client.get_node(node_id)
-        node.set_attribute(ua.AttributeIds.Value, ua.DataValue(value))
-        print("Value written successfully")
-    except Exception as e:
-        print(f"Error writing value: {e}")
+        handler = DataChangeHandler()
+        subscription = client.create_subscription(100, handler)
+        monitored_item = subscription.subscribe_data_change(node)
 
-    handler = DataChangeHandler()
-    subscription = client.create_subscription(100, handler)
-    monitored_item = subscription.subscribe_data_change(node)
-    
-    try:
         while True:
-            pass
+            value = random.random()  # Generate a random value
+            node.set_attribute(ua.AttributeIds.Value, ua.DataValue(value))
+            print(f"Value written: {value}")
+            time.sleep(1)  # Wait for 1 second
+
     except KeyboardInterrupt:
         pass
 
