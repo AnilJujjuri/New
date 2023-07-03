@@ -23,7 +23,6 @@ if __name__ == '__main__':
     print("Client created")
 
     node_id = "ns=3;i=1012"
-    value = ua.Variant(0, ua.VariantType.Int32)
 
     try:
         node = client.get_node(node_id)
@@ -31,10 +30,12 @@ if __name__ == '__main__':
         subscription = client.create_subscription(100, handler)
         monitored_item = subscription.subscribe_data_change(node)
 
+        value = 0
         while True:
-            value.Value += 1  # Increment the value
-            node.set_value(value)
-            print(f"Value written: {value.Value}")
+            value += 1  # Increment the value
+            variant = ua.Variant(value, ua.VariantType.Int32)
+            node.set_value(variant)
+            print(f"Value written: {value}")
             time.sleep(1)  # Wait for 1 second
 
     except KeyboardInterrupt:
