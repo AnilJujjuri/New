@@ -1,9 +1,9 @@
 from opcua import Client
 
 
-def print_value(item):
-    node_id = item.NodeId
-    value = item.Value.Value
+def print_value(node, data_value, _):
+    node_id = node.nodeid
+    value = data_value.Value.Value
     print(f'Data change from server:')
     print(f'Item "{node_id}", Value = {value}')
 
@@ -16,12 +16,12 @@ if __name__ == '__main__':
 
     node_id = "ns=3;i=1012"
     value = 20
-    client.write_attribute(node_id, "Value", value)
+    client.write_value(node_id, value)
 
     print("Value written successfully")
 
-    subscription = client.create_subscription(2000, None)
-    handle = subscription.subscribe_data_change(print_value, "ns=3;i=1003")
+    subscription = client.create_subscription(2000, None, print_value)
+    handle = subscription.subscribe_data_change("ns=3;i=1003")
 
     print("Created")
     print("Subscribed")
