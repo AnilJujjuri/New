@@ -1,4 +1,5 @@
 from opcua import Client
+from opcua import ua
 
 
 def print_value(node, data_value, _):
@@ -15,8 +16,8 @@ if __name__ == '__main__':
     print("Client created")
 
     node_id = "ns=3;i=1012"
-    value = 20
-    client.write_value(node_id, value)
+    value = ua.Variant(20, ua.VariantType.Int16)
+    client.set_attribute(node_id, ua.AttributeIds.Value, value)
 
     print("Value written successfully")
 
