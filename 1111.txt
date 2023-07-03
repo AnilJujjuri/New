@@ -13,13 +13,13 @@ def main():
 
     try:
         while True:
-            # Write the value to the node
-            client.write_attribute(node_id, AttributeIds.Value, DataValue(value=value))
+            # Write the value to the node attribute
+            node = client.get_node(node_id)
+            node.set_attribute_value(AttributeIds.Value, DataValue(value=value))
 
             print("Value written successfully")
 
             # Read the value from the node
-            node = client.get_node(node_id)
             data_value = node.get_value()
             if data_value is not None:
                 print(f"Item \"{node_id}\", Value = {data_value.Value}")
