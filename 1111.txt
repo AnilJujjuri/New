@@ -1,17 +1,30 @@
-Client created
- Session created
- Value written successfully
- Created
- Subscribed
- Data change from server:
- Item "ns=3;i=1003", Value = Double(-0.941271)
- Data change from server:
- Item "ns=3;i=1003", Value = Double(-1.6156)
- Data change from server:
- Item "ns=3;i=1003", Value = Double(1.648361)
- Data change from server:
- Item "ns=3;i=1003", Value = Double(0.9775755)
- Data change from server:
- Item "ns=3;i=1003", Value = Double(-0.85761)
- Data change from server:
- Item "ns=3;i=1003", Value = Double(-1.614)
+from opcua import Client
+
+# Connect to the OPC UA server
+url = "opc.tcp://localhost:53530/OPCUA/SimulationServer"
+client = Client(url)
+client.connect()
+
+# Subscribe to data changes
+subscription = client.create_subscription(100, None)
+
+# Define the data change callback function
+def data_change_callback(node, data):
+    value = data.monitored_item.Value.Value
+    print(f'Data change from server:')
+    print(f'Item "{node}", Value = Double({value})')
+
+# Create a monitored item to track the data change
+item = "ns=3;i=1003"
+monitored_item = subscription.subscribe_data_change(item)
+monitored_item.add_callback(data_change_callback)
+
+# Keep the program running until manually interrupted
+try:
+    while True:
+        pass
+except KeyboardInterrupt:
+    pass
+
+# Disconnect from the server
+client.disconnect()
