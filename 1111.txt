@@ -1,42 +1,11 @@
-from opcua import Client
-from opcua.ua import NodeId, AttributeIds, DataValue, Variant
-import time
-
-def main():
-    client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
-    client.connect()
-
-    print("Client created")
-
-    node_id = NodeId(3, 1012)
-    value = 20
-
-    try:
-        while True:
-            # Write the value to the node attribute
-            node = client.get_node(node_id)
-            data_value = DataValue(Variant(value))
-            node.set_attribute(AttributeIds.Value, data_value)
-
-            print("Value written successfully")
-
-            # Read the value from the node
-            data_value = node.get_value()
-            if data_value is not None:
-                print(f"Item \"{node_id}\", Value = {data_value.Value.VariantType}")
-            else:
-                print(f"Item \"{node_id}\", Value not found")
-
-            # Increment the value for the next iteration
-            value += 1
-
-            # Wait for some time before the next iteration
-            time.sleep(2)
-
-    except KeyboardInterrupt:
-        pass
-
-    client.disconnect()
-
-if __name__ == '__main__':
+Client created
+Traceback (most recent call last):
+  File "d:\OneDrive - LTTS\Desktop\waste\main.py", line 42, in <module>
     main()
+  File "d:\OneDrive - LTTS\Desktop\waste\main.py", line 19, in main
+    node.set_attribute(AttributeIds.Value, data_value)
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\common\node.py", line 263, in set_attribute
+    result[0].check()
+  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\opcua\ua\uatypes.py", line 218, in check
+    raise UaStatusCodeError(self.value)
+opcua.ua.uaerrors._auto.BadNodeIdUnknown: "The node id refers to a node that does not exist in the server address space."(BadNodeIdUnknown)
