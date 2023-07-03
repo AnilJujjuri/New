@@ -1,32 +1,30 @@
 from opcua import Client
-from opcua.ua import NodeId
+import time
 
 # Connect to the OPC UA server
 url = "opc.tcp://localhost:53530/OPCUA/SimulationServer"
 client = Client(url)
 client.connect()
 
-# Subscribe to data changes
-subscription = client.create_subscription(100, None)
+# Get the node to update
+node_id = "ns=3;i=1003"
+node = client.get_node(node_id)
 
-# Define the data change callback function
-def data_change_callback(_, data):
-    item = data.monitored_item.NodeId.to_string()
-    value = data.monitored_item.Value.Value
-    print("Data change from server:")
-    print(f'Item "{item}", Value = Double({value:.6f})')
-
-# Create a monitored item to track the data change
-node_id = NodeId.from_string("ns=3;i=1003")
-monitored_item = subscription.subscribe_data_change(node_id)
-monitored_item.add_callback(data_change_callback)
-
-# Keep the program running until manually interrupted
-try:
-    while True:
-        pass
-except KeyboardInterrupt:
-    pass
+# Update the value in a loop
+while True:
+    # Read the current value
+    current_value = node.get_value()
+    print(f"Current Value: {current_value}")
+    
+    # Calculate the new value (increment by 1)
+    new_value = current_value + 1
+    
+    # Write the new value to the server
+    node.set_value(new_value)
+    print(f"New Value: {new_value}")
+    
+    # Wait for a second before the next iteration
+    time.sleep(1)
 
 # Disconnect from the server
 client.disconnect()
