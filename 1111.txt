@@ -1,6 +1,17 @@
-Exception caught in background thread.  Unable to handle.
-['azure.iot.device.common.transport_exceptions.ConnectionDroppedError: Unexpected disconnection\n']
-{'desired': {'SendData': True, 'SendInterval': 5, '$version': 5}, 'reported': {'SendData': True, 'SendInterval': 5, 'CustomProperty': 2000, 'reported': {'CustomProperty': 2000, 'sensor_id': 123, 'temperature': 25.5, 'humidity': 60.2}, '$version': 75}}
-Exception caught in background thread.  Unable to handle.
-['azure.iot.device.common.transport_exceptions.ConnectionDroppedError: Unexpected disconnection\n']
-{'desired': {'SendData': True, 'SendInterval': 5, '$version': 5}, 'reported': {'SendData': True, 'SendInterval': 5, 'CustomProperty': 2000, 'reported': {'CustomProperty': 2000, 'sensor_id': 123, 'temperature': 25.5, 'humidity': 60.2}, '$version': 76}}
+Client created
+ Session created
+ Value written successfully
+ Created
+ Subscribed
+ Data change from server:
+ Item "ns=3;i=1003", Value = Double(-0.941271)
+ Data change from server:
+ Item "ns=3;i=1003", Value = Double(-1.6156)
+ Data change from server:
+ Item "ns=3;i=1003", Value = Double(1.648361)
+ Data change from server:
+ Item "ns=3;i=1003", Value = Double(0.9775755)
+ Data change from server:
+ Item "ns=3;i=1003", Value = Double(-0.85761)
+ Data change from server:
+ Item "ns=3;i=1003", Value = Double(-1.614)
