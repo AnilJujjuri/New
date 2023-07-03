@@ -1,5 +1,5 @@
 from opcua import Client
-from opcua.ua import NodeId, AttributeIds, DataValue
+from opcua.ua import NodeId, AttributeIds, DataValue, Variant
 import time
 
 def main():
@@ -15,14 +15,15 @@ def main():
         while True:
             # Write the value to the node attribute
             node = client.get_node(node_id)
-            node.set_attribute_value(AttributeIds.Value, DataValue(value=value))
+            data_value = DataValue(Variant(value))
+            node.set_attribute(AttributeIds.Value, data_value)
 
             print("Value written successfully")
 
             # Read the value from the node
             data_value = node.get_value()
             if data_value is not None:
-                print(f"Item \"{node_id}\", Value = {data_value.Value}")
+                print(f"Item \"{node_id}\", Value = {data_value.Value.VariantType}")
             else:
                 print(f"Item \"{node_id}\", Value not found")
 
