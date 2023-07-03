@@ -1,5 +1,6 @@
 from opcua import Client
-from opcua.ua import NodeId, WriteValue, DataValue
+from opcua.ua import NodeId, AttributeIds, DataValue
+import time
 
 def main():
     client = Client("opc.tcp://MYTSL02946.lnties.com:53530/OPCUA/SimulationServer")
@@ -13,13 +14,7 @@ def main():
     try:
         while True:
             # Write the value to the node
-            client.write_values([
-                WriteValue(
-                    node_id=node_id,
-                    attribute_id=7,
-                    value=DataValue(value=value)
-                )
-            ])
+            client.write_attribute(node_id, AttributeIds.Value, DataValue(value=value))
 
             print("Value written successfully")
 
