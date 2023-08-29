@@ -1,19 +1,64 @@
-import minimalmodbus
-from time import sleep
+import time
+import random
+import os
+from azure.iot.device import IoTHubModuleClient, Message
+from pymodbus.server.sync import StartTcpServer
+from pymodbus.datastore import ModbusSequentialDataBlock
+from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
+from dotenv import load_dotenv
+from pathlib import Path
 
-# Modbus TCP server settings
-IP_ADDRESS = '0.0.0.0'  # Listen on all available network interfaces
-PORT = 502
+dotenv_path = Path('config.env')
+load_dotenv(dotenv_path=dotenv_path)
 
-# Create a Modbus instrument instance (slave)
-modbus_server = minimalmodbus.Server(port=PORT, address=1)
+# Azure IoT Hub connection string
+CONNECTION_STRING = os.getenv('device_connection_string')
 
-try:
-    print(f"Starting Modbus TCP server on {IP_ADDRESS}:{PORT}")
-    modbus_server.serial.port = IP_ADDRESS
-    modbus_server.clear_responses()
-    while True:
-        modbus_server.handle_request()  # Handle incoming requests
-        sleep(0.01)  # Sleep to avoid high CPU usage
-except KeyboardInterrupt:
-    print("Modbus TCP server stopped.")
+class ModbusDataBlock(ModbusSequentialDataBlock):
+    def __init__(self, values):
+        super().__init__(values)
+
+def send_to_iothub(data):
+    try:
+        module_client = IoTHubModuleClient.create_from_connection_string(CONNECTION_STRING)
+        module_client.connect()
+        print("Connected to Azure IoT Hub")
+        twin = {"properties": data}
+        module_client.patch_twin_reported_properties(twin)
+        print("Twin reported properties updated")
+        module_client.disconnect()
+        print("Disconnected from Azure IoT Hub")
+    except Exception as e:
+        print("Error sending data to IoT Hub:", str(e))
+
+if __name__ == "__main__":
+    slave_address = 1  # Modbus slave address (unit ID)
+
+    data_store = ModbusSlaveContext(
+        di=ModbusDataBlock([random.randint(0, 65535) for _ in range(10)]),
+        co=ModbusDataBlock([random.randint(0, 65535) for _ in range(10)]),
+        hr=ModbusDataBlock([random.uniform(0, 100) for _ in range(10)]),
+        ir=ModbusDataBlock([random.uniform(0, 100) for _ in range(10)])
+    )
+
+    context = ModbusServerContext(slaves=data_store, single=True)
+
+    server = StartTcpServer(context, address=("localhost", 5020))
+
+    try:
+        while True:
+            telemetry = {
+                "message_type": "telemetry",
+                "data": {
+                    "energy_consumption": random.uniform(0, 100),
+                    "voltage": random.uniform(100, 250),
+                    "current": random.uniform(1, 10),
+                    "power": random.uniform(0.8, 1.0),
+                },
+                "ts": int(time.time())
+            }
+
+            send_to_iothub(telemetry)
+            time.sleep(5)  # Collect data every 5 seconds
+    except KeyboardInterrupt:
+        print("Simulation stopped.")
