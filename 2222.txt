@@ -1,160 +1,90 @@
-import can
-import csv
 import time
-from threading import Thread
+import serial
+import minimalmodbus
+import random
+import os
+from azure.iot.device import IoTHubModuleClient
+from azure.iot.device import IoTHubDeviceClient, Message
+from pathlib import Path
 
+from dotenv import load_dotenv
 
-def send_can_message(bus, message_id, message_data, csv_writer):
-    message = can.Message(
-        arbitration_id=message_id,
-        data=message_data,
-        is_extended_id=False
-    )
-    bus.send(message)
-    print(f"Sent message: ID=0x{message_id:x}, Data={message_data}")
-    csv_writer.writerows([[message_id, message_data]])
+dotenv_path = Path('config.env')
+load_dotenv(dotenv_path=dotenv_path)
+# Azure IoT Hub connection string
+CONNECTION_STRING = os.getenv('device_connection_string')
 
-
-def receive_can_messages(bus):
+def send_to_iothub(data):
     try:
-        while True:
-            message = bus.recv(timeout=1)
-            if message is not None:
-                print(f"Received message: ID=0x{message.arbitration_id:x}, Data={message.data}")
-    except can.CanError as e:
-        print(f"Exception in thread {Thread.current_thread().name}: {e}")
+        module_client = IoTHubModuleClient.create_from_connection_string(CONNECTION_STRING)
+        module_client.connect()
+        print("Connected to Azure IoT Hub")
+        twin={"properties":data}
+        module_client.patch_twin_reported_properties(twin)
+        # module_client.send_message_to_output(data, "output1")
+        print("Message sent to IoT Hub")
+
+        module_client.disconnect()
+        print("Disconnected from Azure IoT Hub")
+    except Exception as e:
+        print("Error sending data to IoT Hub:", str(e))
 
 
-def periodic_message_sender(bus, csv_writer):
-    for message_id in range(0xC7, 0xC9):
-        message_data = [170, 187, 204]
-        send_can_message(bus, message_id, message_data, csv_writer)
-        time.sleep(1)
+# Simulated Modbus device address (unit ID)
+SIMULATOR_UNIT_ID = 1
+
+def generate_random_data(modbus_client, address):
+    random_value = random.uniform(0.0, 100.0)  # Replace the range as per your requirement
+    scaled_value = int(random_value * 1)
+    modbus_client.write_register(address, scaled_value, functioncode=6)
+    print(random_value)
 
 
-def main():
-    bus = can.Bus(interface='virtual', channel='vcan0')
+def collect_and_send_data(modbus_client):
+    try:
+        energy_consumption_address = 0x0000
+        energy_consumption_value = modbus_client.read_register(energy_consumption_address, functioncode=3, signed=True)
 
-    with open('sent_messages.csv', 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['ID', 'Data'])  # Write header to CSV
+        voltage_address = 0x0001
+        voltage_value = modbus_client.read_register(voltage_address, functioncode=3, signed=True)
 
-        receiver_thread = Thread(target=receive_can_messages, args=(bus,))
-        sender_thread = Thread(target=periodic_message_sender, args=(bus, csv_writer))
+        current_address = 0x0002
+        current_value = modbus_client.read_register(current_address, functioncode=3, signed=True)
 
-        receiver_thread.start()
-        sender_thread.start()
+        power_factor_address = 0x0003
+        power_factor_value = modbus_client.read_register(power_factor_address, functioncode=3, signed=True)
 
-        sender_thread.join()
-
-    bus.shutdown()
-
+        telemetry = {
+            "message_type": "telemetry",
+            "data": {
+                "energy_consumption":energy_consumption_value ,
+                "voltage": voltage_value,
+                "current":current_value,
+                "power":power_factor_value,
+            },
+            "ts": int(time.time())
+        }
+        # Send telemetry data to IoT Hub
+        send_to_iothub(telemetry)
+    except Exception as e:
+        print("An error has occurred:", e)
 
 if __name__ == "__main__":
-    main()
-
-Sent message: ID=0x64, Data=[170, 187, 204]
-Sent message: ID=0x65, Data=[170, 187, 204]
-Sent message: ID=0x66, Data=[170, 187, 204]
-Sent message: ID=0x67, Data=[170, 187, 204]
-Sent message: ID=0x68, Data=[170, 187, 204]
-Sent message: ID=0x69, Data=[170, 187, 204]
-Sent message: ID=0x6a, Data=[170, 187, 204]
-Sent message: ID=0x6b, Data=[170, 187, 204]
-Sent message: ID=0x6c, Data=[170, 187, 204]
-Sent message: ID=0x6d, Data=[170, 187, 204]
-Sent message: ID=0x6e, Data=[170, 187, 204]
-Sent message: ID=0x6f, Data=[170, 187, 204]
-Sent message: ID=0x70, Data=[170, 187, 204]
-Sent message: ID=0x71, Data=[170, 187, 204]
-Sent message: ID=0x72, Data=[170, 187, 204]
-Sent message: ID=0x73, Data=[170, 187, 204]
-Sent message: ID=0x74, Data=[170, 187, 204]
-Sent message: ID=0x75, Data=[170, 187, 204]
-Sent message: ID=0x76, Data=[170, 187, 204]
-Sent message: ID=0x77, Data=[170, 187, 204]
-Sent message: ID=0x78, Data=[170, 187, 204]
-Sent message: ID=0x79, Data=[170, 187, 204]
-Sent message: ID=0x7a, Data=[170, 187, 204]
-Sent message: ID=0x7b, Data=[170, 187, 204]
-Sent message: ID=0x7c, Data=[170, 187, 204]
-Sent message: ID=0x7d, Data=[170, 187, 204]
-Sent message: ID=0x7e, Data=[170, 187, 204]
-Sent message: ID=0x7f, Data=[170, 187, 204]
-Sent message: ID=0x80, Data=[170, 187, 204]
-Sent message: ID=0x81, Data=[170, 187, 204]
-Sent message: ID=0x82, Data=[170, 187, 204]
-Sent message: ID=0x83, Data=[170, 187, 204]
-Sent message: ID=0x84, Data=[170, 187, 204]
-Sent message: ID=0x85, Data=[170, 187, 204]
-Sent message: ID=0x86, Data=[170, 187, 204]
-Sent message: ID=0x87, Data=[170, 187, 204]
-Sent message: ID=0x88, Data=[170, 187, 204]
-Sent message: ID=0x89, Data=[170, 187, 204]
-Sent message: ID=0x8a, Data=[170, 187, 204]
-Sent message: ID=0x8b, Data=[170, 187, 204]
-Sent message: ID=0x8c, Data=[170, 187, 204]
-Sent message: ID=0x8d, Data=[170, 187, 204]
-Sent message: ID=0x8e, Data=[170, 187, 204]
-Sent message: ID=0x8f, Data=[170, 187, 204]
-Sent message: ID=0x90, Data=[170, 187, 204]
-Sent message: ID=0x91, Data=[170, 187, 204]
-Sent message: ID=0x92, Data=[170, 187, 204]
-Sent message: ID=0x93, Data=[170, 187, 204]
-Sent message: ID=0x94, Data=[170, 187, 204]
-Sent message: ID=0x95, Data=[170, 187, 204]
-Sent message: ID=0x96, Data=[170, 187, 204]
-Sent message: ID=0x97, Data=[170, 187, 204]
-Sent message: ID=0x98, Data=[170, 187, 204]
-Sent message: ID=0x99, Data=[170, 187, 204]
-Sent message: ID=0x9a, Data=[170, 187, 204]
-Sent message: ID=0x9b, Data=[170, 187, 204]
-Sent message: ID=0x9c, Data=[170, 187, 204]
-Sent message: ID=0x9d, Data=[170, 187, 204]
-Sent message: ID=0x9e, Data=[170, 187, 204]
-Sent message: ID=0x9f, Data=[170, 187, 204]
-Sent message: ID=0xa0, Data=[170, 187, 204]
-Sent message: ID=0xa1, Data=[170, 187, 204]
-Sent message: ID=0xa2, Data=[170, 187, 204]
-Sent message: ID=0xa3, Data=[170, 187, 204]
-Sent message: ID=0xa4, Data=[170, 187, 204]
-Sent message: ID=0xa5, Data=[170, 187, 204]
-Sent message: ID=0xa6, Data=[170, 187, 204]
-Sent message: ID=0xa7, Data=[170, 187, 204]
-Sent message: ID=0xa8, Data=[170, 187, 204]
-Sent message: ID=0xa9, Data=[170, 187, 204]
-Sent message: ID=0xaa, Data=[170, 187, 204]
-Sent message: ID=0xab, Data=[170, 187, 204]
-Sent message: ID=0xac, Data=[170, 187, 204]
-Sent message: ID=0xad, Data=[170, 187, 204]
-Sent message: ID=0xae, Data=[170, 187, 204]
-Sent message: ID=0xaf, Data=[170, 187, 204]
-Sent message: ID=0xb0, Data=[170, 187, 204]
-Sent message: ID=0xb1, Data=[170, 187, 204]
-Sent message: ID=0xb2, Data=[170, 187, 204]
-Sent message: ID=0xb3, Data=[170, 187, 204]
-Sent message: ID=0xb4, Data=[170, 187, 204]
-Sent message: ID=0xb5, Data=[170, 187, 204]
-Sent message: ID=0xb6, Data=[170, 187, 204]
-Sent message: ID=0xb7, Data=[170, 187, 204]
-Sent message: ID=0xb8, Data=[170, 187, 204]
-Sent message: ID=0xb9, Data=[170, 187, 204]
-Sent message: ID=0xba, Data=[170, 187, 204]
-Sent message: ID=0xbb, Data=[170, 187, 204]
-Sent message: ID=0xbc, Data=[170, 187, 204]
-Sent message: ID=0xbd, Data=[170, 187, 204]
-Sent message: ID=0xbe, Data=[170, 187, 204]
-Sent message: ID=0xbf, Data=[170, 187, 204]
-Sent message: ID=0xc0, Data=[170, 187, 204]
-Sent message: ID=0xc1, Data=[170, 187, 204]
-Sent message: ID=0xc2, Data=[170, 187, 204]
-Sent message: ID=0xc3, Data=[170, 187, 204]
-Sent message: ID=0xc4, Data=[170, 187, 204]
-Sent message: ID=0xc5, Data=[170, 187, 204]
-Sent message: ID=0xc6, Data=[170, 187, 204]
-Sent message: ID=0xc7, Data=[170, 187, 204]
-Sent message: ID=0xc8, Data=[170, 187, 204]
-Exception
-    
-
-    
+    # Create a Modbus instrument instance for the simulator
+    rs485 = minimalmodbus.Instrument(os.getenv('com_port'), SIMULATOR_UNIT_ID)
+    rs485.serial.baudrate = os.getenv('baud_rate')
+    rs485.serial.bytesize = int(os.getenv('bytesize'))
+    rs485.serial.parity = minimalmodbus.serial.PARITY_NONE
+    rs485.serial.stopbits = int(os.getenv('stopbits'))
+    rs485.serial.timeout = int(os.getenv('timeout'))
+    rs485.debug = False
+    rs485.mode = minimalmodbus.MODE_RTU
+    try:
+        while True:
+            collect_and_send_data(rs485)
+            generate_random_data(rs485, address=0x0000)
+            generate_random_data(rs485, address=0x0001)
+            generate_random_data(rs485, address=0x0002)
+            generate_random_data(rs485, address=0x0003)
+    except KeyboardInterrupt:
+        print("Simulation stopped.")
