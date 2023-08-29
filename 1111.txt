@@ -1,364 +1,127 @@
-
-
 import asyncio
 import json
 import time
-
 from opcua import Client
-
-
-# node_id="ns=3;i=1009"
-server_url="opc.tcp://0.0.0.0:4842/freeopcua/server/"
+from fastapi import FastAPI
 
 # Simulated Edge client for illustration purposes
-
 class EdgeClient:
-
     def send_output_event(self, event_name, message):
         print(f"Sending message to {event_name}: {message}")
 
-
 # Simulated Message class for illustration purposes
-
 class Message:
-
     def __init__(self, content):
         self.content = content
 
     def __str__(self):
         return self.content
 
-
-# Simulated OPC UA client for illustration purposes
-
-class OPCUAClient:
-
-    @staticmethod
-    def create(options):
-        return OPCUAClient()
-
-    async def connect(self, server_url):
-        print(f"Connecting to {server_url}")
-
-        await asyncio.sleep(1)
-
-    async def create_session(self):
-        print("Creating session")
-
-        await asyncio.sleep(1)
-
-    async def read_variable_value(self, address):
-        print(f"Reading variable at {address}")
-
-        await asyncio.sleep(1)
-
-        return {"Value": {"Value": 42}}
-
-    async def disconnect(self):
-        print("Disconnecting")
-
-        await asyncio.sleep(1)
-
-
 # Simulated implementation for demonstration purposes
-
 class SimulatedEdgeOPCUAClient:
-
     async def send_output_event(self, event_name, message):
         print(f"Sending output event: {event_name} - {message}")
 
-
 # Define connection options and strategies
-
 connection_strategy = {
-
     "initial_delay": 1000,
-
     "max_retry": 1
-
 }
 
 options = {
-
     "application_name": "EdgeOPCUAClient",
-
     "connection_strategy": connection_strategy,
-
     "security_mode": None,
-
     "security_policy": None,
-
     "endpoint_must_exist": False
-
 }
 
 twin = None
-# data1= "ns=3;i=1014"
-
-client = OPCUAClient.create(options)
-
+client = Client(options)
 
 # Define the collect function
-
-
-
-
-
-# OPC_NODE_TO_MONITOR = "ns=3;i=1009"
-# node = client.get_node(OPC_NODE_TO_MONITOR)
-# value = node.get_value()
-# print("Read value from OPC UA:", value)
-
-
-
-
-
-
-
-
 async def collect(edge_client, message_class):
     while True:
-
         try:
-
             print("Running")
-
             connection = await get_connection()
-
             connection = twin['devices']
-
-            # connection = connection.devices
-
-            # print(connection)
-
             if connection:
-
                 for key in connection:
-
                     element = connection[key]
-
                     telemetry = {
-
                         "thingId": element["thingId"],
-
                         "deviceId": element["id"],
-
-                        "message_type": "telemetry"
-
+                        "message_type": "telemetry",
+                        "data": {}
                     }
-
                     try:
-                        url=element["connection"]["serverUrl"]
+                        url = element["connection"]["serverUrl"]
                         print(url)
-                        client = Client(url)
-                        print(client)
-                        client.connect()
+                        client.connect(url)
                         print("Connected!")
                         root = client.get_root_node()
-                        print("Objects node is: ", root)
-                        print("Children of root are: ", root.get_children())
-                        #previous logic
                         myvar = root.get_child(["0:Objects", "2:MyObject", "2:MyVariable"])
-                        obj = root.get_child(["0:Objects", "2:MyObject"])
-                        print("myvar is: ", myvar)
-                        print("myobj is: ", obj)
-                        value=myvar.get_value()
-
-                        telemetry["data"]=value
-                        print("after data",telemetry)
-
-
-
-
+                        value = myvar.get_value()
+                        telemetry["data"] = value
+                        print("after data", telemetry)
                         session = client.create_session()
-                        print(session)
                         print("Session created!")
                         telemetry["ts"] = int(time.time())
                         print(telemetry)
 
                         if telemetry:
                             output_msg = message_class(json.dumps(telemetry))
-
                             await edge_client.send_output_event('opcuaTelemetry', output_msg)
-                        # await client.disconnect()
-                        # print("Done!")
-                        await asyncio.sleep(element["interval"] / 1000)
-                        await session.close()
-
                     except Exception as error:
-
                         print("Failed to communicate with OPC UA server:", error)
-
                     finally:
                         if client:
                             await client.disconnect()
-
                             print("Done!")
-                    #
-                    # await asyncio.sleep(element["interval"] / 1000)
-
+                        await asyncio.sleep(element["interval"] / 1000)
+                        await session.close()
         except Exception as error:
-
             print("Error in communication/processing:", error)
-
         await asyncio.sleep(0.1)
 
-
-# Define set_connection, get_connection, and timeout functions (similar to JavaScript)
-
-
+# Define set_connection, get_connection, and timeout functions
 async def set_connection(twin_obj, edge_client):
     global twin
-
     if twin is None:
-
         twin = twin_obj
-
         await asyncio.sleep(1)
-
         print('Starting Data Acquisition Task')
-
         await collect(edge_client, message_class=Message)
-
     else:
-
         twin = twin_obj
-
     print("Updated twin")
-
     print(twin_obj)
-
     print(twin)
-
 
 async def get_connection():
     return twin
 
-
 async def timeout(ms):
     await asyncio.sleep(ms / 1000)
 
+# Define FastAPI instance
+app = FastAPI()
 
-# Define the main function
-
-async def main():
-    edge_client = SimulatedEdgeOPCUAClient()
-
-    message_class = Message
-
-    await set_connection({
-
-        "devices": {
-
-            "59f350207d83beb8887f7c2242a38ab7": {
-
-                "id": "59f350207d83beb8887f7c2242a38ab7",
-
-                "type": "opcua",
-
-                "thingId": "8942c62f33e2bb3c547f9bfc22d77f27",
-
-                "interval": 5000,
-
-                "connection": {
-
-                    "serverUrl": "opc.tcp://localhost:4841/freeopcua/server/"
-
-                },
-
-                "signals": {
-
-                    "temperature": {
-
-                        "name": "temperature",
-
-                        "address": "ns=3;i=1014",
-
-                        "interval": 1000
-
-                    },
-
-                    "humidity": {
-
-                        "name": "humidity",
-
-                        "address": "ns=3;i=1013",
-
-                        "interval": 1000
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }, edge_client)
-
-    await collect(edge_client, message_class)
-
-
-# Run the main function
-
-if __name__ == "__main__":
-    asyncio.run(main())
-
-
-
-
-
-
-import time
-from opcua import ua, Server
-from fastapi import FastAPI
-sr = FastAPI()
-server = Server()
-server.set_endpoint("opc.tcp://0.0.0.0:4842/freeopcua/server/")
-
-# setup our own namespace, not really necessary but should as spec
-uri = "http://examples.freeopcua.github.io"
-idx = server.register_namespace(uri)
-
-# get Objects node, this is where we should put our nodes
-objects = server.get_objects_node()
-
-# populating our address space
-myobj = objects.add_object(idx, "MyObject")
-myvar = myobj.add_variable(idx, "MyVariable", 6.7)
-myvar.set_writable() # Set MyVariable to be writable by clients
-
-# starting server
-server.start()
-try:
-    count = 0
-    while True:
-        time.sleep(0.1)
-        count += 0.1
-        myvar.set_value(count)
-finally:
-        #close connection, remove subscriptions, etc
-        print("done")
-
-@sr.get("/")
+# Define endpoints for FastAPI
+@app.get("/")
 def read_root():
     return {"Hello": "World"}
 
-@sr.get("/get_variable")
+@app.get("/get_variable")
 def read_variable():
     return {"value": myvar.get_value()}
 
-@sr.put("/set_variable")
+@app.put("/set_variable")
 def write_variable(value: float):
     myvar.set_value(value)
     return {"success": True}
 
-@sr.on_event("shutdown")
-def shutdown_event():
-    server.stop()
-def set_connection_callback():
-            connect.set_connection(devices, module_client, Message)
-            module_client.schedule_method("setConnection", set_connection_callback)
-
-
-
+# Run the main function
+if __name__ == "__main__":
+    asyncio.run(main())
