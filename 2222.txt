@@ -58,3 +58,15 @@ if __name__ == "__main__":
                 time.sleep(5)  # Collect data every 5 seconds
         except KeyboardInterrupt:
             print("Simulation stopped.")
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns="http://www.modbus.org/xml/ConfigurationFile.xsd" version="1.0">
+  <slave id="1" name="ModbusSlave1">
+    <tcpport id="502"/>
+    <readpoints>
+      <register id="0" name="EnergyConsumption" address="0" datatype="int32" length="2"/>
+      <register id="1" name="Voltage" address="2" datatype="float32" length="2"/>
+      <register id="2" name="Current" address="4" datatype="float32" length="2"/>
+      <register id="3" name="PowerFactor" address="6" datatype="float32" length="2"/>
+    </readpoints>
+  </slave>
+</configuration>
