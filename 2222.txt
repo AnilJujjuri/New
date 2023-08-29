@@ -1,50 +1,63 @@
-import os
-import random
 import time
-import minimalmodbus
+import random
+import os
 from azure.iot.device import IoTHubModuleClient, Message
+import minimalmodbus
+from pathlib import Path
+
+# Load environment variables from .env file
+from dotenv import load_dotenv
+
+dotenv_path = Path('config.env')
+load_dotenv(dotenv_path=dotenv_path)
 
 # Azure IoT Hub connection string
 CONNECTION_STRING = os.getenv('device_connection_string')
 
-# Modbus TCP server parameters
-SERVER_IP = "0.0.0.0"  # Listen on all available network interfaces
-SERVER_PORT = 5020
+def send_to_iothub(data):
+    try:
+        module_client = IoTHubModuleClient.create_from_connection_string(CONNECTION_STRING)
+        module_client.connect()
+        print("Connected to Azure IoT Hub")
+        twin = {"properties": data}
+        module_client.patch_twin_reported_properties(twin)
+        print("Twin reported properties updated")
+        module_client.disconnect()
+        print("Disconnected from Azure IoT Hub")
+    except Exception as e:
+        print("Error sending data to IoT Hub:", str(e))
 
-# Create a TCP socket
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((SERVER_IP, SERVER_PORT))
-server_socket.listen(1)
-print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
+if __name__ == "__main__":
+    slave_address = 1  # Modbus slave address (unit ID)
+    modbus_instrument = minimalmodbus.Instrument('localhost', slave_address)
+    modbus_instrument.serial.baudrate = 9600  # Modify baudrate as needed
+    modbus_instrument.serial.timeout = 0.2  # Modify timeout as needed
+    modbus_instrument.mode = minimalmodbus.MODE_TCP
 
-# Create a Modbus instrument instance for the simulator
-modbus_instrument = minimalmodbus.Instrument('/dev/ttyUSB0', 1)  # Replace with your Modbus instrument settings
-modbus_instrument.serial.baudrate = 9600  # Modify baudrate as needed
-modbus_instrument.serial.timeout = 1
+    try:
+        while True:
+            energy_consumption_value = random.uniform(0, 100)
+            voltage_value = random.uniform(100, 250)
+            current_value = random.uniform(1, 10)
+            power_factor_value = random.uniform(0.8, 1.0)
 
-def handle_client(client_socket):
-    while True:
-        request = client_socket.recv(1024)
-        if not request:
-            break
+            modbus_instrument.write_register(0, int(energy_consumption_value), functioncode=6)
+            modbus_instrument.write_register(2, int(voltage_value * 100), functioncode=6)
+            modbus_instrument.write_register(4, int(current_value * 100), functioncode=6)
+            modbus_instrument.write_register(6, int(power_factor_value * 100), functioncode=6)
 
-        # Handle the Modbus request here
-        # Implement your logic to read Modbus registers
+            telemetry = {
+                "message_type": "telemetry",
+                "data": {
+                    "energy_consumption": energy_consumption_value,
+                    "voltage": voltage_value,
+                    "current": current_value,
+                    "power": power_factor_value,
+                },
+                "ts": int(time.time())
+            }
 
-        # Generate random data for testing
-        energy_consumption_value = random.uniform(0.0, 100.0)
-        voltage_value = random.uniform(100.0, 240.0)
-        current_value = random.uniform(0.0, 10.0)
-        power_factor_value = random.uniform(0.0, 1.0)
-
-        # Respond to the client
-        response = ...  # Implement your Modbus response logic
-        client_socket.send(response)
-
-    client_socket.close()
-
-while True:
-    client_socket, client_address = server_socket.accept()
-    print("Accepted connection from:", client_address)
-    client_thread = threading.Thread(target=handle_client, args=(client_socket,))
-    client_thread.start()
+            send_to_iothub(telemetry)
+            time.sleep(5)  # Collect data every 5 seconds
+    except KeyboardInterrupt:
+        print("Simulation stopped.")
