@@ -1,8 +1,13 @@
+import os
+import random
+import time
 import minimalmodbus
-import socket
-import threading
+from azure.iot.device import IoTHubModuleClient, Message
 
-# Define Modbus TCP server parameters
+# Azure IoT Hub connection string
+CONNECTION_STRING = os.getenv('device_connection_string')
+
+# Modbus TCP server parameters
 SERVER_IP = "0.0.0.0"  # Listen on all available network interfaces
 SERVER_PORT = 5020
 
@@ -10,8 +15,12 @@ SERVER_PORT = 5020
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((SERVER_IP, SERVER_PORT))
 server_socket.listen(1)
-
 print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
+
+# Create a Modbus instrument instance for the simulator
+modbus_instrument = minimalmodbus.Instrument('/dev/ttyUSB0', 1)  # Replace with your Modbus instrument settings
+modbus_instrument.serial.baudrate = 9600  # Modify baudrate as needed
+modbus_instrument.serial.timeout = 1
 
 def handle_client(client_socket):
     while True:
@@ -20,10 +29,16 @@ def handle_client(client_socket):
             break
 
         # Handle the Modbus request here
-        # Implement your logic to read/write Modbus registers
+        # Implement your logic to read Modbus registers
+
+        # Generate random data for testing
+        energy_consumption_value = random.uniform(0.0, 100.0)
+        voltage_value = random.uniform(100.0, 240.0)
+        current_value = random.uniform(0.0, 10.0)
+        power_factor_value = random.uniform(0.0, 1.0)
 
         # Respond to the client
-        response = b"\x01\x02\x00\x00\x00\x06\x01\x03\x02\x00\x00\x00"  # Sample response
+        response = ...  # Implement your Modbus response logic
         client_socket.send(response)
 
     client_socket.close()
