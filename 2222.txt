@@ -1,9 +1,18 @@
 import time
+import random
+import os
 from azure.iot.device import IoTHubModuleClient, Message
-from pymodbus.client.sync import ModbusTcpClient
+import minimalmodbus
+from pathlib import Path
+
+# Load environment variables from .env file
+from dotenv import load_dotenv
+
+dotenv_path = Path('config.env')
+load_dotenv(dotenv_path=dotenv_path)
 
 # Azure IoT Hub connection string
-CONNECTION_STRING = "<your-connection-string>"
+CONNECTION_STRING = os.getenv('device_connection_string')
 
 def send_to_iothub(data):
     try:
@@ -20,53 +29,52 @@ def send_to_iothub(data):
 
 def collect_and_send_data(modbus_client):
     try:
-        with modbus_client as client:
-            energy_consumption_response = client.read_holding_registers(0, count=2, unit=1)
-            voltage_response = client.read_holding_registers(2, count=2, unit=1)
-            current_response = client.read_holding_registers(4, count=2, unit=1)
-            power_factor_response = client.read_holding_registers(6, count=2, unit=1)
+        energy_consumption_value = random.uniform(0, 100)
+        voltage_value = random.uniform(100, 250)
+        current_value = random.uniform(1, 10)
+        power_factor_value = random.uniform(0.8, 1.0)
 
-            energy_consumption_value = int.from_bytes(energy_consumption_response.registers, byteorder='big')
-            voltage_value = voltage_response.registers[0] + voltage_response.registers[1] / 100.0
-            current_value = current_response.registers[0] + current_response.registers[1] / 100.0
-            power_factor_value = power_factor_response.registers[0] + power_factor_response.registers[1] / 100.0
+        modbus_client.write_register(0, int(energy_consumption_value), functioncode=6)
+        modbus_client.write_register(1, int(voltage_value * 100), functioncode=6)
+        modbus_client.write_register(2, int(current_value * 100), functioncode=6)
+        modbus_client.write_register(3, int(power_factor_value * 100), functioncode=6)
 
-            telemetry = {
-                "message_type": "telemetry",
-                "data": {
-                    "energy_consumption": energy_consumption_value,
-                    "voltage": voltage_value,
-                    "current": current_value,
-                    "power": power_factor_value,
-                },
-                "ts": int(time.time())
-            }
+        telemetry = {
+            "message_type": "telemetry",
+            "data": {
+                "energy_consumption": energy_consumption_value,
+                "voltage": voltage_value,
+                "current": current_value,
+                "power": power_factor_value,
+            },
+            "ts": int(time.time())
+        }
 
-            # Send telemetry data to IoT Hub
-            send_to_iothub(telemetry)
+        # Send telemetry data to IoT Hub
+        send_to_iothub(telemetry)
 
     except Exception as e:
         print("An error has occurred:", e)
 
 if __name__ == "__main__":
-    slave_ip = 'localhost'
+    slave_address = 1  # Modbus slave address (unit ID)
+    com_port = os.getenv('com_port')
+    baud_rate = int(os.getenv('baud_rate'))
+    bytesize = int(os.getenv('bytesize'))
+    stopbits = int(os.getenv('stopbits'))
+    timeout = int(os.getenv('timeout'))
 
-    with ModbusTcpClient(slave_ip, port=502) as modbus_client:
-        try:
-            while True:
-                collect_and_send_data(modbus_client)
-                time.sleep(5)  # Collect data every 5 seconds
-        except KeyboardInterrupt:
-            print("Simulation stopped.")
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration xmlns="http://www.modbus.org/xml/ConfigurationFile.xsd" version="1.0">
-  <slave id="1" name="ModbusSlave1">
-    <tcpport id="502"/>
-    <readpoints>
-      <register id="0" name="EnergyConsumption" address="0" datatype="int32" length="2"/>
-      <register id="1" name="Voltage" address="2" datatype="float32" length="2"/>
-      <register id="2" name="Current" address="4" datatype="float32" length="2"/>
-      <register id="3" name="PowerFactor" address="6" datatype="float32" length="2"/>
-    </readpoints>
-  </slave>
-</configuration>
+    modbus_instrument = minimalmodbus.Instrument(com_port, slave_address)
+    modbus_instrument.serial.baudrate = baud_rate
+    modbus_instrument.serial.bytesize = bytesize
+    modbus_instrument.serial.parity = minimalmodbus.serial.PARITY_NONE
+    modbus_instrument.serial.stopbits = stopbits
+    modbus_instrument.serial.timeout = timeout
+    modbus_instrument.debug = False
+
+    try:
+        while True:
+            collect_and_send_data(modbus_instrument)
+            time.sleep(5)  # Collect data every 5 seconds
+    except KeyboardInterrupt:
+        print("Simulation stopped.")
