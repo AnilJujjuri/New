@@ -1,80 +1,35 @@
-import time
-import random
-import os
-from azure.iot.device import IoTHubModuleClient, Message
 import minimalmodbus
-from pathlib import Path
+import socket
+import threading
 
-# Load environment variables from .env file
-from dotenv import load_dotenv
+# Define Modbus TCP server parameters
+SERVER_IP = "0.0.0.0"  # Listen on all available network interfaces
+SERVER_PORT = 5020
 
-dotenv_path = Path('config.env')
-load_dotenv(dotenv_path=dotenv_path)
+# Create a TCP socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((SERVER_IP, SERVER_PORT))
+server_socket.listen(1)
 
-# Azure IoT Hub connection string
-CONNECTION_STRING = os.getenv('device_connection_string')
+print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
 
-def send_to_iothub(data):
-    try:
-        module_client = IoTHubModuleClient.create_from_connection_string(CONNECTION_STRING)
-        module_client.connect()
-        print("Connected to Azure IoT Hub")
-        twin = {"properties": data}
-        module_client.patch_twin_reported_properties(twin)
-        print("Twin reported properties updated")
-        module_client.disconnect()
-        print("Disconnected from Azure IoT Hub")
-    except Exception as e:
-        print("Error sending data to IoT Hub:", str(e))
+def handle_client(client_socket):
+    while True:
+        request = client_socket.recv(1024)
+        if not request:
+            break
 
-def collect_and_send_data(modbus_client):
-    try:
-        energy_consumption_value = random.uniform(0, 100)
-        voltage_value = random.uniform(100, 250)
-        current_value = random.uniform(1, 10)
-        power_factor_value = random.uniform(0.8, 1.0)
+        # Handle the Modbus request here
+        # Implement your logic to read/write Modbus registers
 
-        modbus_client.write_register(0, int(energy_consumption_value), functioncode=6)
-        modbus_client.write_register(1, int(voltage_value * 100), functioncode=6)
-        modbus_client.write_register(2, int(current_value * 100), functioncode=6)
-        modbus_client.write_register(3, int(power_factor_value * 100), functioncode=6)
+        # Respond to the client
+        response = b"\x01\x02\x00\x00\x00\x06\x01\x03\x02\x00\x00\x00"  # Sample response
+        client_socket.send(response)
 
-        telemetry = {
-            "message_type": "telemetry",
-            "data": {
-                "energy_consumption": energy_consumption_value,
-                "voltage": voltage_value,
-                "current": current_value,
-                "power": power_factor_value,
-            },
-            "ts": int(time.time())
-        }
+    client_socket.close()
 
-        # Send telemetry data to IoT Hub
-        send_to_iothub(telemetry)
-
-    except Exception as e:
-        print("An error has occurred:", e)
-
-if __name__ == "__main__":
-    slave_address = 1  # Modbus slave address (unit ID)
-    com_port = os.getenv('com_port')
-    baud_rate = int(os.getenv('baud_rate'))
-    bytesize = int(os.getenv('bytesize'))
-    stopbits = int(os.getenv('stopbits'))
-    timeout = int(os.getenv('timeout'))
-
-    modbus_instrument = minimalmodbus.Instrument(com_port, slave_address)
-    modbus_instrument.serial.baudrate = baud_rate
-    modbus_instrument.serial.bytesize = bytesize
-    modbus_instrument.serial.parity = minimalmodbus.serial.PARITY_NONE
-    modbus_instrument.serial.stopbits = stopbits
-    modbus_instrument.serial.timeout = timeout
-    modbus_instrument.debug = False
-
-    try:
-        while True:
-            collect_and_send_data(modbus_instrument)
-            time.sleep(5)  # Collect data every 5 seconds
-    except KeyboardInterrupt:
-        print("Simulation stopped.")
+while True:
+    client_socket, client_address = server_socket.accept()
+    print("Accepted connection from:", client_address)
+    client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+    client_thread.start()
