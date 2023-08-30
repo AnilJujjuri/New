@@ -61,3 +61,8 @@ if __name__ == "__main__":
     finally:
         # Close the client connection
         client.close()
+An error has occurred: 'ModbusIOException' object has no attribute 'registers'
+An error has occurred: Modbus Error: [Invalid Message] ReadCoilsResponse(32)
+An error has occurred: Modbus Error: [Invalid Message] ReadCoilsResponse(32)
+An error has occurred: Modbus Error: [Invalid Message] ReadCoilsResponse(32)
+An error has occurred: Modbus Error: [Invalid Message] ReadCoilsResponse(32)
