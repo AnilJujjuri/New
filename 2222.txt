@@ -3,7 +3,7 @@ import socket
 import threading
 
 # Define Modbus TCP server parameters
-SERVER_IP = "127.0.0.1"  # Listen on all available network interfaces
+SERVER_IP = "192.168.219.49"  # Listen on all available network interfaces
 SERVER_PORT = 5020
 
 # Create a TCP socket
@@ -13,48 +13,20 @@ server_socket.listen(1)
 
 print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
 
-# Create a Modbus instrument
-instrument = minimalmodbus.Instrument('dummy', 1)  # 'dummy' is a placeholder
-
-# Dictionary to hold Modbus register values
-registers = {
-    0: 12345,
-    1: 67890
-    # Add more registers and initial values as needed
-}
-
 def handle_client(client_socket):
     while True:
         request = client_socket.recv(1024)
         if not request:
             break
 
-        # Handle the Modbus request and build the response
-        response = handle_modbus_request(request)
+        # Handle the Modbus request here
+        # Implement your logic to read/write Modbus registers
 
         # Respond to the client
+        response = b"\x01\x02\x00\x00\x00\x06\x01\x03\x02\x00\x00\x00"  # Sample response
         client_socket.send(response)
 
     client_socket.close()
-
-def handle_modbus_request(request):
-    # Extract relevant information from the request
-    function_code = ord(request[7])  # Assuming function code is at index 7
-    register_address = int.from_bytes(request[8:10], byteorder='big')  # Assuming register address is at index 8 and 9
-
-    if function_code == 3:  # Read holding registers
-        value = registers.get(register_address, 0)  # Get the value from the dictionary
-        response = b"\x01\x03\x04" + value.to_bytes(2, byteorder='big')  # Construct response
-
-    elif function_code == 6:  # Write single register
-        value = int.from_bytes(request[10:], byteorder='big')  # Extract the value to write
-        registers[register_address] = value  # Update the dictionary
-        response = b"\x01\x06" + request[8:10]  # Echo the register address in the response
-
-    else:
-        response = b"\x01\x00"  # Unsupported function code response
-
-    return response
 
 while True:
     client_socket, client_address = server_socket.accept()
