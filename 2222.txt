@@ -1,5 +1,31 @@
-{'properties': {'energy_consumption': 0, 'voltage': 0, 'current': 0, 'power': 0}}
-{'properties': {'energy_consumption': 0, 'voltage': 0, 'current': 0, 'power': 0}}
-{'properties': {'energy_consumption': 0, 'voltage': 0, 'current': 0, 'power': 0}}
-{'properties': {'energy_consumption': 0, 'voltage': 0, 'current': 0, 'power': 0}}
-{'properties': {'energy_consumption': 0, 'voltage': 0, 'current': 0, 'power': 0}}
+from pymodbus.client.sync import ModbusTcpClient
+
+# Connect to the Modbus TCP server
+client = ModbusTcpClient('127.0.0.1', port=5020)
+
+# Address of the register to write and read
+register_address = 0x0000
+
+# Value to write
+write_value = 12345
+
+try:
+    # Write value to the Modbus register
+    client.write_register(register_address, write_value, unit=0, functioncode=6)
+    print(f"Value {write_value} written to register {register_address}")
+
+    # Read the value from the Modbus register
+    response = client.read_holding_registers(register_address, count=1, unit=0, functioncode=3)
+
+    if response.isError():
+        print("Error reading register:", response)
+    else:
+        read_value = response.registers[0]
+        print(f"Value read from register {register_address}: {read_value}")
+
+except Exception as e:
+    print("An error has occurred:", e)
+
+finally:
+    # Close the client connection
+    client.close()
