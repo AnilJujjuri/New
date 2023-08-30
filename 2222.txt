@@ -1,12 +1,2 @@
-import socket
-
-SERVER_IP = "192.168.219.49"
-SERVER_PORT = 5020
-
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-try:
-    server_socket.bind((SERVER_IP, SERVER_PORT))
-    print("Server bound to {}:{}".format(SERVER_IP, SERVER_PORT))
-except Exception as e:
-    print("Error binding to {}:{}".format(SERVER_IP, SERVER_PORT))
-    print("Error:", e)
+Error binding to 192.168.219.49:5020
+Error: [WinError 10049] The requested address is not valid in its context
