@@ -1,4 +1,4 @@
-from pymodbus.client.sync import ModbusTcpClient
+from pymodbus.client import ModbusTcpClient
 
 # Connect to the Modbus TCP server
 client = ModbusTcpClient('127.0.0.1', port=5020)
