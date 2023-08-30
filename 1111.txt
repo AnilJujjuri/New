@@ -1,127 +1,35 @@
-import asyncio
-import json
-import time
-from opcua import Client
-from fastapi import FastAPI
+import minimalmodbus
+import socket
+import threading
 
-# Simulated Edge client for illustration purposes
-class EdgeClient:
-    def send_output_event(self, event_name, message):
-        print(f"Sending message to {event_name}: {message}")
+# Define Modbus TCP server parameters
+SERVER_IP = "192.168.0.104"  # Listen on all available network interfaces
+SERVER_PORT = 5020
 
-# Simulated Message class for illustration purposes
-class Message:
-    def __init__(self, content):
-        self.content = content
+# Create a TCP socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((SERVER_IP, SERVER_PORT))
+server_socket.listen(1)
 
-    def __str__(self):
-        return self.content
+print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
 
-# Simulated implementation for demonstration purposes
-class SimulatedEdgeOPCUAClient:
-    async def send_output_event(self, event_name, message):
-        print(f"Sending output event: {event_name} - {message}")
-
-# Define connection options and strategies
-connection_strategy = {
-    "initial_delay": 1000,
-    "max_retry": 1
-}
-
-options = {
-    "application_name": "EdgeOPCUAClient",
-    "connection_strategy": connection_strategy,
-    "security_mode": None,
-    "security_policy": None,
-    "endpoint_must_exist": False
-}
-
-twin = None
-client = Client(options)
-
-# Define the collect function
-async def collect(edge_client, message_class):
+def handle_client(client_socket):
     while True:
-        try:
-            print("Running")
-            connection = await get_connection()
-            connection = twin['devices']
-            if connection:
-                for key in connection:
-                    element = connection[key]
-                    telemetry = {
-                        "thingId": element["thingId"],
-                        "deviceId": element["id"],
-                        "message_type": "telemetry",
-                        "data": {}
-                    }
-                    try:
-                        url = element["connection"]["serverUrl"]
-                        print(url)
-                        client.connect(url)
-                        print("Connected!")
-                        root = client.get_root_node()
-                        myvar = root.get_child(["0:Objects", "2:MyObject", "2:MyVariable"])
-                        value = myvar.get_value()
-                        telemetry["data"] = value
-                        print("after data", telemetry)
-                        session = client.create_session()
-                        print("Session created!")
-                        telemetry["ts"] = int(time.time())
-                        print(telemetry)
+        request = client_socket.recv(1024)
+        if not request:
+            break
 
-                        if telemetry:
-                            output_msg = message_class(json.dumps(telemetry))
-                            await edge_client.send_output_event('opcuaTelemetry', output_msg)
-                    except Exception as error:
-                        print("Failed to communicate with OPC UA server:", error)
-                    finally:
-                        if client:
-                            await client.disconnect()
-                            print("Done!")
-                        await asyncio.sleep(element["interval"] / 1000)
-                        await session.close()
-        except Exception as error:
-            print("Error in communication/processing:", error)
-        await asyncio.sleep(0.1)
+        # Handle the Modbus request here
+        # Implement your logic to read/write Modbus registers
 
-# Define set_connection, get_connection, and timeout functions
-async def set_connection(twin_obj, edge_client):
-    global twin
-    if twin is None:
-        twin = twin_obj
-        await asyncio.sleep(1)
-        print('Starting Data Acquisition Task')
-        await collect(edge_client, message_class=Message)
-    else:
-        twin = twin_obj
-    print("Updated twin")
-    print(twin_obj)
-    print(twin)
+        # Respond to the client
+        response = b"\x01\x02\x00\x00\x00\x06\x01\x03\x02\x00\x00\x00"  # Sample response
+        client_socket.send(response)
 
-async def get_connection():
-    return twin
+    client_socket.close()
 
-async def timeout(ms):
-    await asyncio.sleep(ms / 1000)
-
-# Define FastAPI instance
-app = FastAPI()
-
-# Define endpoints for FastAPI
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-@app.get("/get_variable")
-def read_variable():
-    return {"value": myvar.get_value()}
-
-@app.put("/set_variable")
-def write_variable(value: float):
-    myvar.set_value(value)
-    return {"success": True}
-
-# Run the main function
-if __name__ == "__main__":
-    asyncio.run(main())
+while True:
+    client_socket, client_address = server_socket.accept()
+    print("Accepted connection from:", client_address)
+    client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+    client_thread.start()
