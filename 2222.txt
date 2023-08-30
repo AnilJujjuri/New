@@ -13,18 +13,49 @@ server_socket.listen(1)
 
 print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
 
+# Create a Modbus instrument
+instrument = minimalmodbus.Instrument('dummy', 1)  # 'dummy' is a placeholder
+
+# Dictionary to hold Modbus register values
+registers = {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0
+}
+
 def handle_client(client_socket):
     while True:
         request = client_socket.recv(1024)
         if not request:
             break
 
-        # Handle the Modbus request here
-        # Implement your logic to read/write Modbus registers
+        # Extract Modbus request information
+        function_code = request[7]  # Function code is at index 7
 
-        # Respond to the client
-        response = b"\x01\x02\x00\x00\x00\x06\x01\x03\x02\x00\x00\x00"  # Sample response
-        client_socket.send(response)
+        # Handle Modbus read request (Function code 3)
+        if function_code == 3:
+            address = request[8]  # Address to read from is at index 8
+            register_value = registers.get(address, 0)  # Get the value from the registers dictionary
+
+            # Build Modbus response with function code, data length, and register value
+            response = bytearray([1, 3, 2, 0, (register_value >> 8) & 0xFF, register_value & 0xFF])
+            client_socket.send(response)
+
+        # Handle Modbus write request (Function code 6)
+        elif function_code == 6:
+            address = request[8]  # Address to write to is at index 8
+            value = (request[10] << 8) + request[11]  # Combine the two bytes to get the value
+            registers[address] = value  # Update the registers dictionary
+
+            # Build Modbus response with function code and address
+            response = bytearray([1, 6, 0, address, (value >> 8) & 0xFF, value & 0xFF])
+            client_socket.send(response)
+
+        else:
+            # Unsupported function code
+            response = b"\x01\x81\x00\x00\x00\x03"  # Modbus exception response
+            client_socket.send(response)
 
     client_socket.close()
 
