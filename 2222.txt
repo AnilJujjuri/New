@@ -1,2 +1,35 @@
-Error binding to 192.168.219.49:5020
-Error: [WinError 10049] The requested address is not valid in its context
+import minimalmodbus
+import socket
+import threading
+
+# Define Modbus TCP server parameters
+SERVER_IP = "192.168.0.104"  # Listen on all available network interfaces
+SERVER_PORT = 5020
+
+# Create a TCP socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((SERVER_IP, SERVER_PORT))
+server_socket.listen(1)
+
+print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
+
+def handle_client(client_socket):
+    while True:
+        request = client_socket.recv(1024)
+        if not request:
+            break
+
+        # Handle the Modbus request here
+        # Implement your logic to read/write Modbus registers
+
+        # Respond to the client
+        response = b"\x01\x02\x00\x00\x00\x06\x01\x03\x02\x00\x00\x00"  # Sample response
+        client_socket.send(response)
+
+    client_socket.close()
+
+while True:
+    client_socket, client_address = server_socket.accept()
+    print("Accepted connection from:", client_address)
+    client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+    client_thread.start()
