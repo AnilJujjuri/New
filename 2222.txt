@@ -1,31 +1,22 @@
-from pymodbus.client import ModbusTcpClient
+import minimalmodbus
 
-# Connect to the Modbus TCP server
-client = ModbusTcpClient('127.0.0.1', port=5020)
+# Set up the Modbus client
+instrument = minimalmodbus.Instrument('localhost', 5020)  # Adjust IP and port as needed
 
-# Address of the register to write and read
-register_address = 0x0000
+# Set the Modbus communication parameters (optional)
+instrument.serial.timeout = 1  # Timeout in seconds
+instrument.serial.baudrate = 19200  # Baud rate
+instrument.mode = minimalmodbus.MODE_TCP  # Modbus TCP mode
 
-# Value to write
-write_value = 12345
+# Read a register
+register_address = 0x0000  # Adjust the register address as needed
+read_value = instrument.read_register(register_address, functioncode=3)
 
-try:
-    # Write value to the Modbus register
-    client.write_register(register_address, write_value, unit=0, functioncode=6)
-    print(f"Value {write_value} written to register {register_address}")
+print(f"Value read from register {register_address}: {read_value}")
 
-    # Read the value from the Modbus register
-    response = client.read_holding_registers(register_address, count=1, unit=0, functioncode=3)
+# Write to a register
+write_address = 0x0001  # Adjust the register address as needed
+write_value = 12345  # Value to write
+instrument.write_register(write_address, write_value, functioncode=6)
 
-    if response.isError():
-        print("Error reading register:", response)
-    else:
-        read_value = response.registers[0]
-        print(f"Value read from register {register_address}: {read_value}")
-
-except Exception as e:
-    print("An error has occurred:", e)
-
-finally:
-    # Close the client connection
-    client.close()
+print(f"Value {write_value} written to register {write_address}")
