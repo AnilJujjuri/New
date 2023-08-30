@@ -1,4 +1,27 @@
-Traceback (most recent call last):
-  File "C:\Users\40020507\Downloads\diagslave-3.4\win\new1.py", line 4, in <module>
-    instrument=minimalmodbus.Instrument('localhost', port=5020)
-TypeError: Instrument.__init__() got multiple values for argument 'port'
+from pymodbus.client.sync import ModbusTcpClient
+
+# Connect to the Modbus TCP server
+client = ModbusTcpClient('localhost', port=5020)
+
+# Read holding registers (function code 3)
+address = 0  # Starting register address
+count = 10   # Number of registers to read
+response = client.read_holding_registers(address, count, unit=0)  # Unit ID of the slave
+
+if response.isError():
+    print("Error reading registers:", response)
+else:
+    print("Read values:", response.registers)
+
+# Write to holding registers (function code 6)
+write_address = 0  # Register address to write to
+write_value = 12345  # Value to write
+response = client.write_register(write_address, write_value, unit=0)
+
+if response.isError():
+    print("Error writing register:", response)
+else:
+    print("Write successful")
+
+# Close the client connection
+client.close()
