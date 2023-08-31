@@ -1,5 +1,5 @@
 import socket
-from pymodbus.server import StartTcpServer
+from pymodbus.server.sync import ModbusTcpServer
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
 
 hostname = socket.gethostname()
@@ -7,12 +7,8 @@ server_ip_address = socket.gethostbyname(hostname)
 server_port = 502
 store = ModbusSlaveContext(zero_mode=True)
 context = ModbusServerContext(slaves=store, single=True)
-print("[+]Info : Server Started on IP : {I} and PORT : {P} ".format(I=server_ip_address,P=server_port))
-StartTcpServer(context, address=(server_ip_address,server_port))
-Traceback (most recent call last):
-  File "C:\Users\40020507\Downloads\diagslave-3.4\win\tets1.py", line 11, in <module>
-    StartTcpServer(context, address=(server_ip_address,server_port))
-TypeError: StartTcpServer() takes 0 positional arguments but 1 was given
-[+]Info : Server Started on IP : 192.168.0.104 and PORT : 502 
 
-Process finished with exit code 1
+server = ModbusTcpServer(context, address=(server_ip_address, server_port))
+print("[+]Info : Server Started on IP : {I} and PORT : {P} ".format(I=server_ip_address, P=server_port))
+
+server.serve_forever()
