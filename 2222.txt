@@ -1,4 +1,19 @@
-C:\Users\40020507\Downloads\diagslave-3.4\win\tets1.py:14: RuntimeWarning: coroutine 'ModbusTcpServer.serve_forever' was never awaited
-  server.serve_forever()
-RuntimeWarning: Enable tracemalloc to get the object allocation traceback
-[+]Info : Server Started on IP : 192.168.0.104 and PORT : 502 
+import socket
+from pymodbus.server.sync import ModbusTcpServer
+from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
+
+hostname = socket.gethostname()
+server_ip_address = socket.gethostbyname(hostname)
+server_port = 502
+store = ModbusSlaveContext(zero_mode=True)
+context = ModbusServerContext(slaves=store, single=True)
+
+server = ModbusTcpServer(context, address=(server_ip_address, server_port))
+print("[+]Info : Server Started on IP : {I} and PORT : {P} ".format(I=server_ip_address, P=server_port))
+
+try:
+    server.serve_forever()
+except KeyboardInterrupt:
+    print("Server stopped.")
+finally:
+    server.server_close()
