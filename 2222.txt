@@ -1,15 +1,4 @@
-from pymodbus.server.sync import StartTcpServer
-from pymodbus.datastore import ModbusSequentialDataBlock
-from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
-from pymodbus.transaction import ModbusRtuFramer, ModbusAsciiFramer
-from pymodbus.transaction import ModbusBinaryFramer
-
-# Create a Modbus data block with example values
-block = ModbusSequentialDataBlock(0, [10]*100)
-
-# Create a slave context using the data block
-store = ModbusSlaveContext(di=block, co=block, hr=block, ir=block)
-context = ModbusServerContext(slaves=store, single=True)
-
-# Run the Modbus TCP server on the specified address and port
-StartTcpServer(context, address=("0.0.0.0", 502))
+Traceback (most recent call last):
+  File "C:\Users\40020507\Downloads\diagslave-3.4\win\new.py", line 55, in <module>
+    StartTcpServer(context, address=("0.0.0.0", 502))
+TypeError: StartTcpServer() takes 0 positional arguments but 1 was given
