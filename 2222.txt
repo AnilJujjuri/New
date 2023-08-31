@@ -1,25 +1,15 @@
-import socket
-import asyncio
-from pymodbus.server.asyncio import StartTcpServer
+from pymodbus.server.sync import StartTcpServer
+from pymodbus.datastore import ModbusSequentialDataBlock
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
+from pymodbus.transaction import ModbusRtuFramer, ModbusAsciiFramer
+from pymodbus.transaction import ModbusBinaryFramer
 
-async def run_server():
-    hostname = socket.gethostname()
-    server_ip_address = socket.gethostbyname(hostname)
-    server_port = 502
-    store = ModbusSlaveContext(zero_mode=True)
-    context = ModbusServerContext(slaves=store, single=True)
-    
-    server = await StartTcpServer(context, address=(server_ip_address, server_port))
-    print("[+]Info : Server Started on IP : {I} and PORT : {P} ".format(I=server_ip_address, P=server_port))
-    
-    try:
-        await server.serve_forever()
-    except KeyboardInterrupt:
-        print("Server stopped.")
-    finally:
-        await server.shutdown()
-        await server.server_close()
+# Create a Modbus data block with example values
+block = ModbusSequentialDataBlock(0, [10]*100)
 
-if __name__ == "__main__":
-    asyncio.run(run_server())
+# Create a slave context using the data block
+store = ModbusSlaveContext(di=block, co=block, hr=block, ir=block)
+context = ModbusServerContext(slaves=store, single=True)
+
+# Run the Modbus TCP server on the specified address and port
+StartTcpServer(context, address=("0.0.0.0", 502))
