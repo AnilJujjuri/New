@@ -1,19 +1,25 @@
 import socket
-from pymodbus.server.sync import ModbusTcpServer
+import asyncio
+from pymodbus.server.asyncio import StartTcpServer
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
 
-hostname = socket.gethostname()
-server_ip_address = socket.gethostbyname(hostname)
-server_port = 502
-store = ModbusSlaveContext(zero_mode=True)
-context = ModbusServerContext(slaves=store, single=True)
+async def run_server():
+    hostname = socket.gethostname()
+    server_ip_address = socket.gethostbyname(hostname)
+    server_port = 502
+    store = ModbusSlaveContext(zero_mode=True)
+    context = ModbusServerContext(slaves=store, single=True)
+    
+    server = await StartTcpServer(context, address=(server_ip_address, server_port))
+    print("[+]Info : Server Started on IP : {I} and PORT : {P} ".format(I=server_ip_address, P=server_port))
+    
+    try:
+        await server.serve_forever()
+    except KeyboardInterrupt:
+        print("Server stopped.")
+    finally:
+        await server.shutdown()
+        await server.server_close()
 
-server = ModbusTcpServer(context, address=(server_ip_address, server_port))
-print("[+]Info : Server Started on IP : {I} and PORT : {P} ".format(I=server_ip_address, P=server_port))
-
-try:
-    server.serve_forever()
-except KeyboardInterrupt:
-    print("Server stopped.")
-finally:
-    server.server_close()
+if __name__ == "__main__":
+    asyncio.run(run_server())
