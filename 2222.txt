@@ -1,13 +1,23 @@
-from pymodbus.server.sync import StartTcpServer
-from pymodbus.datastore import ModbusSequentialDataBlock
-from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
+from modbus_tk import modbus_tcp
+from modbus_tk.defines import ModbusSlave
 
-# Create a Modbus data block with example values
-block = ModbusSequentialDataBlock(0, [10] * 100)
+# Create a Modbus TCP server
+server = modbus_tcp.TcpServer(port=502)
 
-# Create a slave context using the data block
-store = ModbusSlaveContext(di=block, co=block, hr=block, ir=block)
-context = ModbusServerContext(slaves=store, single=True)
+# Create a Modbus slave instance
+slave = server.add_slave(1)
 
-# Run the Modbus TCP server on the specified address and port
-server = StartTcpServer(context, address=("0.0.0.0", 502))
+# Add a block of holding registers (40000-49999)
+slave.add_block('holding', ModbusSlave.HOLDING_REGISTERS, 40000, 100)
+
+# Start the Modbus server
+server.start()
+print("Modbus TCP server is running...")
+
+try:
+    # Run the server indefinitely
+    server.join()
+except KeyboardInterrupt:
+    # Stop the server on keyboard interrupt
+    server.stop()
+    print("Modbus TCP server stopped.")
