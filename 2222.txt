@@ -1,23 +1,4 @@
-from modbus_tk import modbus_tcp
-from modbus_tk.defines import ModbusSlave
-
-# Create a Modbus TCP server
-server = modbus_tcp.TcpServer(port=502)
-
-# Create a Modbus slave instance
-slave = server.add_slave(1)
-
-# Add a block of holding registers (40000-49999)
-slave.add_block('holding', ModbusSlave.HOLDING_REGISTERS, 40000, 100)
-
-# Start the Modbus server
-server.start()
-print("Modbus TCP server is running...")
-
-try:
-    # Run the server indefinitely
-    server.join()
-except KeyboardInterrupt:
-    # Stop the server on keyboard interrupt
-    server.stop()
-    print("Modbus TCP server stopped.")
+Traceback (most recent call last):
+  File "C:\Users\40020507\Downloads\diagslave-3.4\win\new.py", line 43, in <module>
+    from modbus_tk.defines import ModbusSlave
+ImportError: cannot import name 'ModbusSlave' from 'modbus_tk.defines' (C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\modbus_tk\defines.py)
