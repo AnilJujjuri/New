@@ -1,34 +1,18 @@
-from pymodbus.client import ModbusTcpClient
+import socket
+from pymodbus.server import StartTcpServer
+from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
 
-# Connect to the Modbus TCP server
-client = ModbusTcpClient('192.168.0.104', port=5020)
+hostname = socket.gethostname()
+server_ip_address = socket.gethostbyname(hostname)
+server_port = 502
+store = ModbusSlaveContext(zero_mode=True)
+context = ModbusServerContext(slaves=store, single=True)
+print("[+]Info : Server Started on IP : {I} and PORT : {P} ".format(I=server_ip_address,P=server_port))
+StartTcpServer(context, address=(server_ip_address,server_port))
+Traceback (most recent call last):
+  File "C:\Users\40020507\Downloads\diagslave-3.4\win\tets1.py", line 11, in <module>
+    StartTcpServer(context, address=(server_ip_address,server_port))
+TypeError: StartTcpServer() takes 0 positional arguments but 1 was given
+[+]Info : Server Started on IP : 192.168.0.104 and PORT : 502 
 
-# Address of the register to write and read
-register_address = 0x0000
-
-# Value to write
-write_value = 12345
-
-try:
-    # Write value to the Modbus register
-    client.write_registers(register_address, write_value, unit=0, functioncode=6)
-    print(f"Value {write_value} written to register {register_address}")
-
-    # Read the value from the Modbus register
-    response = client.read_holding_registers(register_address, count=1, unit=0, functioncode=3)
-
-    if response.isError():
-        print("Error reading register:", response)
-    else:
-        read_value = response.registers[0]
-        print(f"Value read from register {register_address}: {read_value}")
-
-except Exception as e:
-    print("An error has occurred:", e)
-
-finally:
-    # Close the client connection
-    client.close()
-
-Value 12345 written to register 0
-An error has occurred: Modbus Error: [Invalid Message] ReadCoilsResponse(32)
+Process finished with exit code 1
