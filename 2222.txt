@@ -1,33 +1,6 @@
-import socket
-import random
-import time
-from pyModbusTCP.server import ModbusServer
-
-hostname = socket.gethostname()
-server_ip_address = socket.gethostbyname(hostname)
-server_port = 502
-print(f"[+]Info : IP Address for Modbus Server : {server_ip_address}")
-
-server = ModbusServer(server_ip_address, server_port, no_block=True)
-server.start()
-
-print(f"[+]info : Server is Online on IP : {server_ip_address} and PORT : {server_port} ")
-
-# Initialize holding registers with zeros
-holding_registers = [0] * 4
-
-# Keep the script running indefinitely
-try:
-    while True:
-        # Generate random data for four registers
-        random_data = [random.randint(0, 65535) for _ in range(4)]
-
-        # Update the holding registers
-        for i, value in enumerate(random_data):
-            server._write_single_register(0, i, value)
-
-        print("Random data:", random_data)
-        time.sleep(1)  # Wait for a second before generating the next set of data
-
-except KeyboardInterrupt:
-    server.stop()
+[+]Info : IP Address for Modbus Server : 192.168.0.104
+[+]info : Server is Online on IP : 192.168.0.104 and PORT : 502 
+Traceback (most recent call last):
+  File "c:\Users\40020507\Downloads\diagslave-3.4\win\new.py", line 77, in <module>
+    server._write_multiple_registers(0, i, value)
+TypeError: ModbusServer._write_multiple_registers() takes 2 positional arguments but 4 were given
