@@ -1,4 +1,49 @@
-Traceback (most recent call last):
-  File "C:\Users\40020507\Downloads\diagslave-3.4\win\new.py", line 43, in <module>
-    from modbus_tk.defines import ModbusSlave
-ImportError: cannot import name 'ModbusSlave' from 'modbus_tk.defines' (C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\modbus_tk\defines.py)
+# import minimalmodbus
+# import socket
+# import threading
+#
+# # Define Modbus TCP server parameters
+# SERVER_IP = "192.168.0.104"  # Listen on all available network interfaces
+# SERVER_PORT = 5020
+#
+# # Create a TCP socket
+# server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# server_socket.bind((SERVER_IP, SERVER_PORT))
+# server_socket.listen(1)
+#
+# print("Modbus TCP server is listening on {}:{}".format(SERVER_IP, SERVER_PORT))
+#
+# def handle_client(client_socket):
+#     while True:
+#         request = client_socket.recv(1024)
+#         if not request:
+#             break
+#
+#         # Handle the Modbus request here
+#         # Implement your logic to read/write Modbus registers
+#
+#         # Respond to the client
+#         response = b"\x01\x02\x00\x00\x00\x06\x01\x03\x02\x00\x00\x00"  # Sample response
+#         client_socket.send(response)
+#
+#     client_socket.close()
+#
+# while True:
+#     client_socket, client_address = server_socket.accept()
+#     print("Accepted connection from:", client_address)
+#     client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+#     client_thread.start()
+#
+# # from pyModbusTCP.client import ModbusClient
+# # client = ModbusClient(host='192.168.0.104', port=502)
+# # client.open()
+# # print(client.read_holding_registers(0))
+import socket
+from pyModbusTCP.server import ModbusServer
+hostname = socket.gethostname()    
+server_ip_address = socket.gethostbyname(hostname)
+server_port = 502
+print(f"[+]Info : IP Address for Modbus Server : {server_ip_address}")
+server = ModbusServer(server_ip_address,server_port,no_block=True)
+server.start()
+print(f"[+]info : Server is Online on IP : {server_ip_address} and PORT : {server_port} ")
