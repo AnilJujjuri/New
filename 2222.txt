@@ -1,9 +1,19 @@
 import socket
 from pyModbusTCP.server import ModbusServer
+
 hostname = socket.gethostname()    
 server_ip_address = socket.gethostbyname(hostname)
 server_port = 502
 print(f"[+]Info : IP Address for Modbus Server : {server_ip_address}")
-server = ModbusServer(server_ip_address,server_port,no_block=True)
+
+server = ModbusServer(server_ip_address, server_port, no_block=True)
 server.start()
+
 print(f"[+]info : Server is Online on IP : {server_ip_address} and PORT : {server_port} ")
+
+# Keep the script running indefinitely
+try:
+    while True:
+        pass  # You can add other code here if needed
+except KeyboardInterrupt:
+    server.stop()
