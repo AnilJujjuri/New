@@ -1,12 +1,33 @@
-Traceback (most recent call last):
-  File "c:\Users\40020507\Downloads\diagslave-3.4\win\new.py", line 52, in <module>
-    from pymodbus3.server.sync import StartTcpServer
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pymodbus3\server\sync.py", line 12, in <module>
-    from pymodbus3.factory import ServerDecoder
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pymodbus3\factory.py", line 16, in <module>
-    from pymodbus3.pdu import IllegalFunctionRequest
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pymodbus3\pdu.py", line 8, in <module>
-    from pymodbus3.utilities import rtu_frame_size
-  File "C:\Users\40020507\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pymodbus3\utilities.py", line 10, in <module>
-    from collections import Callable
-ImportError: cannot import name 'Callable' from 'collections' (C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\collections\__init__.py)
+import socket
+import random
+import time
+from pyModbusTCP.server import ModbusServer
+
+hostname = socket.gethostname()
+server_ip_address = socket.gethostbyname(hostname)
+server_port = 502
+print(f"[+]Info : IP Address for Modbus Server : {server_ip_address}")
+
+server = ModbusServer(server_ip_address, server_port, no_block=True)
+server.start()
+
+print(f"[+]info : Server is Online on IP : {server_ip_address} and PORT : {server_port} ")
+
+# Initialize holding registers with zeros
+holding_registers = [0] * 4
+
+# Keep the script running indefinitely
+try:
+    while True:
+        # Generate random data for four registers
+        random_data = [random.randint(0, 65535) for _ in range(4)]
+
+        # Update the holding registers
+        for i, value in enumerate(random_data):
+            server._write_single_register(i, value)
+
+        print("Random data:", random_data)
+        time.sleep(1)  # Wait for a second before generating the next set of data
+
+except KeyboardInterrupt:
+    server.stop()
