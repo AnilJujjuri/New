@@ -1,4 +1,6 @@
 import socket
+import random
+import time
 from pyModbusTCP.server import ModbusServer
 
 hostname = socket.gethostname()    
@@ -14,6 +16,15 @@ print(f"[+]info : Server is Online on IP : {server_ip_address} and PORT : {serve
 # Keep the script running indefinitely
 try:
     while True:
-        pass  # You can add other code here if needed
+        # Generate random data for four registers
+        random_data = [random.randint(0, 65535) for _ in range(4)]
+        server.holding_regs[0] = random_data[0]
+        server.holding_regs[1] = random_data[1]
+        server.holding_regs[2] = random_data[2]
+        server.holding_regs[3] = random_data[3]
+
+        print("Random data:", random_data)
+        time.sleep(1)  # Wait for a second before generating the next set of data
+
 except KeyboardInterrupt:
     server.stop()
