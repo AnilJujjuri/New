@@ -2,5 +2,5 @@
 [+]info : Server is Online on IP : 192.168.0.104 and PORT : 502 
 Traceback (most recent call last):
   File "c:\Users\40020507\Downloads\diagslave-3.4\win\new.py", line 77, in <module>
-    server._write_multiple_registers(0, i, value)
-TypeError: ModbusServer._write_multiple_registers() takes 2 positional arguments but 4 were given
+    server._write_single_register(0, i, value)
+TypeError: ModbusServer._write_single_register() takes 2 positional arguments but 4 were given
