@@ -1,64 +1,108 @@
-import unittest
-from modbus_client import collect_and_send_data
+from pyModbusTCP.client import ModbusClient
+import time
+from azure.iot.device import IoTHubModuleClient
 
-class TestModbusClient(unittest.TestCase):
 
-    def test_collect_and_send_data_with_valid_data(self):
-        # Define a mock Modbus client with read_holding_registers method
-        class MockModbusClient:
-            def __init__(self):
-                self.registers = [100, 220, 10, 0]  # Replace with sample data
-            def read_holding_registers(self, address, count, unit=0):
-                return self
+def send_to_iothub(data, edgeClient):
 
-        # Mock the send_to_iothub function
-        def send_to_iothub_mock(data):
-            self.assertEqual(data, {
-                "properties": {
-                    "energy_consumption": 100,
-                    "voltage": 220,
-                    "current": 10,
-                    "power": 0
+    try:
+        # CONNECTION_STRING = "HostName=EDGTneerTrainingPractice.azure-devices.net;DeviceId=edgeDevive-opcua;SharedAccessKey=jiDsujbUvP2MySzcHAg+eDYEKf97zrh+YTqM6sGjkQU="
+        # module_client = IoTHubModuleClient.create_from_connection_string(
+        #     CONNECTION_STRING)
+        # module_client.connect()
+        edgeClient.patch_twin_reported_properties(data)
+        # module_client.disconnect()
+        print(f"Successfully sent data to IoT Hub--->  {data}")
+    except Exception as e:
+        print("Error sending data to IoT Hub:", str(e))
+
+
+def collect(twin, edgeClient, Message):
+    last_data = None
+    # twin2={
+    #         'desired': {
+    #             '$version': 1,
+    #             'SERVER_IP':"3.86.56.32",
+    #             'SERVER_PORT':2109
+    #         },
+    #         'reported': {
+    #             'properties': {
+    #                 'temperature': 32,
+    #                 'pressure': 64
+    #             },
+    #             '$version': 2326
+    #         }
+    # }
+    # print(twin)
+    SERVER_IP = "192.168.0.107"
+    SERVER_PORT = 502
+
+    client = ModbusClient(host=SERVER_IP, port=SERVER_PORT)
+
+    if not client.is_open:
+        if not client.open():
+            print(f"Unable to connect to {SERVER_IP}:{SERVER_PORT}")
+            exit(1)
+    try:
+        while True:
+            # Read temperature and pressure values from the server
+            data = client.read_holding_registers(0, 4)
+
+            if data:
+                energy = data[0]
+                voltage = data[1]
+                current = data[2]
+                power = data[3]
+
+                data_to_send = {
+                    "energy": energy,
+                    "voltage": voltage,
+                    "current": current,
+                    "power": power
                 }
-            })
 
-        # Call the function with the mocked objects
-        client = MockModbusClient()
-        collect_and_send_data(client, send_to_iothub_mock)
+                if last_data != data_to_send:
+                    send_to_iothub(data_to_send, edgeClient)
+                    print(data_to_send)
+                    last_data = data_to_send
+                else:
+                    pass
 
-    def test_collect_and_send_data_with_invalid_data(self):
-        # Define a mock Modbus client with read_holding_registers method
-        class MockModbusClient:
-            def __init__(self):
-                self.registers = [50, -10, 5, 300]  # Invalid data
-            def read_holding_registers(self, address, count, unit=0):
-                return self
+                # send_to_iothub(data_to_send,edgeClient)
+                # # print(f"Temperature: {temperature}°C")
+                # # print(f"Pressure: {pressure} hPa")
+                # print(data_to_send)
+                # time.sleep(2)
+            else:
+                print("Failed to read data from the server")
 
-        # Mock the send_to_iothub function
-        def send_to_iothub_mock(data):
-            # This function should not be called because of invalid data
-            self.fail("send_to_iothub_mock should not be called")
+    except KeyboardInterrupt:
+        print("Closing Modbus client...")
+        client.close()
 
-        # Call the function with the mocked objects
-        client = MockModbusClient()
-        collect_and_send_data(client, send_to_iothub_mock)
 
-    def test_collect_and_send_data_with_empty_response(self):
-        # Define a mock Modbus client with read_holding_registers method
-        class MockModbusClient:
-            def __init__(self):
-                self.registers = []  # Empty response
-            def read_holding_registers(self, address, count, unit=0):
-                return self
+def setConnection(twinObj, edgeClient, Message):
+    print(twinObj)
+    myedgeclient = edgeClient
+    myMessage = Message
 
-        # Mock the send_to_iothub function
-        def send_to_iothub_mock(data):
-            # This function should not be called because of empty response
-            self.fail("send_to_iothub_mock should not be called")
+    global twin
+    twin = twinObj
 
-        # Call the function with the mocked objects
-        client = MockModbusClient()
-        collect_and_send_data(client, send_to_iothub_mock)
+    if twin:
+        twin = twinObj
+        time.sleep(1)
+        print("Starting data acquisition task")
 
-if __name__ == '__main__':
-    unittest.main()
+        collect(twin, myedgeclient, myMessage)
+    else:
+        twin = twinObj
+    print("Updated twin")
+    # print(twinObj)
+    # print(twin)
+
+    # SERVER_IP = "3.86.56.32"
+    # SERVER_PORT = 2109
+
+    # print(SERVER_IP)
+    # print(SERVER_PORT)
